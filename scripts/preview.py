@@ -7,10 +7,16 @@ import threading
 import time
 
 from build import ROOT, build
+from import_photos import prepare_local, SECTIONS
 
 
 def fingerprint():
-    paths = [ROOT / 'scripts' / 'build.py']
+    paths = list((ROOT / 'scripts').glob('*.py'))
+    for name in SECTIONS:
+        folder = ROOT.parent / name
+        if folder.exists():
+            paths.append(folder)
+            paths.extend(p for p in folder.rglob('*') if not p.name.startswith('.'))
     for name in ['content', 'assets']:
         paths.extend(p for p in (ROOT / name).rglob('*') if p.is_file())
     return tuple(sorted((str(p), p.stat().st_mtime_ns, p.stat().st_size) for p in paths))
@@ -24,7 +30,9 @@ def watch(stop):
             if current != previous:
                 time.sleep(.3)
                 previous = fingerprint()
+                prepare_local()
                 build(ROOT / 'content', ROOT / 'dist')
+                previous = fingerprint()
                 print('预览已更新，请刷新浏览器。', flush=True)
         except Exception as error:
             print(f'暂未更新，保留上次成功预览：{error}', flush=True)
@@ -34,6 +42,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--port', type=int, default=8080)
     args = parser.parse_args()
+    prepare_local()
     build(ROOT / 'content', ROOT / 'dist')
     server = ThreadingHTTPServer(('127.0.0.1', args.port), partial(SimpleHTTPRequestHandler, directory=str(ROOT / 'dist')))
     stop = threading.Event()

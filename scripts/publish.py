@@ -6,6 +6,7 @@ import subprocess
 import sys
 
 from build import ROOT, build
+from import_photos import prepare_local
 
 
 def git(*args, capture=False):
@@ -24,11 +25,12 @@ def main():
             raise RuntimeError('请在克隆下来的网站仓库内发布。')
         if git('branch', '--show-current', capture=True) != 'main':
             raise RuntimeError('请先切换到 main 分支。')
+        prepare_local()
+        build(ROOT / 'content', ROOT / 'dist')
         # Never force push or silently replace the current remote history.
         git('fetch', 'origin', 'main')
         if git('rev-list', '--count', 'HEAD..origin/main', capture=True) != '0':
             raise RuntimeError('GitHub 有更新。请先在 VS Code 获取并合并远端更新，再发布。')
-        build(ROOT / 'content', ROOT / 'dist')
         subprocess.run([sys.executable, '-m', 'unittest', 'discover', '-s', 'tests', '-v'], cwd=ROOT, check=True, timeout=120)
         if git('status', '--porcelain', capture=True):
             # Git requests local identity configuration instead of inventing an email.

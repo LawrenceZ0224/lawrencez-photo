@@ -61,6 +61,20 @@ class PublishingTests(unittest.TestCase):
                 self.assertFalse(image.getexif())
         self.assertEqual(source.read_bytes(), original)
 
+    def test_location_menu_and_large_photo_limit(self):
+        album = self.content / 'wandering' / 'italy'
+        album.mkdir()
+        (album / 'album.json').write_text(json.dumps({'title': 'Italy'}))
+        Image.new('RGB', (4000, 5000), '#8899aa').save(album / '001.jpg')
+        builder.build(self.content, self.output, '/lawrencez-photo')
+        page = (self.output / 'wandering' / 'index.html').read_text()
+        self.assertIn('aria-controls="location-menu"', page)
+        self.assertIn('href="/lawrencez-photo/wandering/italy/"', page)
+        self.assertNotIn('class="grid"', page)
+        photo = json.loads((self.output / 'manifest.json').read_text())['albums']['wandering'][0]['photos'][0]
+        self.assertEqual(max(photo['variants'][-1]['width'], photo['variants'][-1]['height']), 3840)
+        self.assertLessEqual(max(photo['variants'][0]['width'], photo['variants'][0]['height']), 800)
+
     def test_invalid_cover_keeps_previous_site(self):
         builder.build(self.content, self.output)
         old_page = (self.output / 'index.html').read_bytes()

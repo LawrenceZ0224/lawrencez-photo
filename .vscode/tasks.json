@@ -5,29 +5,66 @@
       "label": "网站：首次连接 GitHub 仓库",
       "type": "process",
       "command": "${workspaceFolder}/.venv/bin/python",
-      "args": ["scripts/connect.py"],
-      "options": {"cwd": "${workspaceFolder}"},
+      "args": [
+        "scripts/connect.py"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
       "problemMatcher": [],
-      "presentation": {"reveal": "always", "panel": "dedicated"}
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      }
+    },
+    {
+      "label": "网站：导入照片",
+      "type": "process",
+      "command": "${workspaceFolder}/.venv/bin/python",
+      "args": [
+        "scripts/import_photos.py"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      }
     },
     {
       "label": "网站：本地预览",
       "type": "process",
       "command": "${workspaceFolder}/.venv/bin/python",
-      "args": ["scripts/preview.py"],
-      "options": {"cwd": "${workspaceFolder}"},
+      "args": [
+        "scripts/preview.py"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
       "isBackground": true,
       "problemMatcher": [],
-      "presentation": {"reveal": "always", "panel": "dedicated"}
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      }
     },
     {
       "label": "网站：检查并发布到 GitHub",
       "type": "process",
       "command": "${workspaceFolder}/.venv/bin/python",
-      "args": ["scripts/publish.py"],
-      "options": {"cwd": "${workspaceFolder}"},
+      "args": [
+        "scripts/publish.py"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
       "problemMatcher": [],
-      "presentation": {"reveal": "always", "panel": "dedicated"}
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      }
     }
   ]
 }

@@ -16,7 +16,7 @@ ROOT = Path(__file__).resolve().parents[1]
 SECTIONS = [("work", "Work"), ("wandering", "Wandering on Earth"),
             ("portrait", "Portrait"), ("profile", "Profile"), ("journal", "Journal")]
 FORMATS = {".jpg", ".jpeg", ".png", ".webp"}
-WIDTHS = (640, 1280, 2560)
+WIDTHS = (640, 1280)
 
 
 def esc(value):
@@ -37,10 +37,14 @@ def natural_key(value):
 
 def photo_variants(source, output):
     # Content-derived paths remain stable when files are renamed or re-ordered.
-    key = hashlib.sha256(source.read_bytes() + b'pipeline-v1-srgb-q90').hexdigest()[:24]
+    key = hashlib.sha256(source.read_bytes() + b'pipeline-v3-webp88-jpeg90-3840').hexdigest()[:24]
     folder = output / 'media' / key
     manifest = folder / 'photo.json'
     if manifest.exists():
+        return read_json(manifest)
+    cached = output.parent / 'dist' / 'media' / key
+    if (cached / 'photo.json').exists():
+        shutil.copytree(cached, folder, copy_function=os.link)
         return read_json(manifest)
     folder.mkdir(parents=True)
     with Image.open(source) as original:
@@ -58,18 +62,21 @@ def photo_variants(source, output):
                 image = image.convert('RGB')
         variants = []
         # Keep small originals at their native size; never upscale.
-        for width in sorted({min(w, image.width) for w in WIDTHS}):
+        limit = min(image.width, max(1, round(3840 * image.width / max(image.size))))
+        for width in sorted({min(w, limit) for w in WIDTHS} | {limit}):
             height = max(1, round(image.height * width / image.width))
             resized = image.resize((width, height), Image.Resampling.LANCZOS)
             # Fresh RGB image strips EXIF, including location metadata.
             clean = Image.new('RGB', resized.size)
             clean.paste(resized)
-            for ext in ('webp', 'jpg'):
-                filename = f'{width}.{ext}'
-                clean.save(folder / filename, quality=90, **({'optimize': True} if ext == 'jpg' else {}))
-            variants.append({'width': width, 'height': height,
-                             'webp': f'media/{key}/{width}.webp', 'jpg': f'media/{key}/{width}.jpg'})
-        result = {'id': key, 'width': image.width, 'height': image.height, 'variants': variants}
+            webp = f'media/{key}/{width}.webp'
+            clean.save(folder / f'{width}.webp', quality=88, method=4)
+            jpg = None
+            if width <= 1280:
+                jpg = f'media/{key}/{width}.jpg'
+                clean.save(folder / f'{width}.jpg', quality=90, optimize=True)
+            variants.append({'width': width, 'height': height, 'webp': webp, 'jpg': jpg})
+        result = {'id': key, 'width': image.width, 'height': image.height, 'variants': variants, 'full': variants[-1]['webp']}
     manifest.write_text(json.dumps(result, ensure_ascii=False), encoding='utf-8')
     return result
 
@@ -112,6 +119,8 @@ def build(content, destination, base_path=''):
                             any(not isinstance(x, (int, float)) or not 0 <= x <= 100 for x in focus)):
                         raise ValueError(f'{path}: 裁切位置需为两个0到100之间的数字')
                     photos.append(photo)
+                    if len(photos) % 25 == 0:
+                        print(f'{meta["title"]}：已生成 {len(photos)} 张网页图片', flush=True)
                 cover_name = meta.get('cover', '')
                 if cover_name and cover_name not in [p['file'] for p in photos]:
                     raise ValueError(f'{folder}: 封面 {cover_name} 不存在')
@@ -122,7 +131,7 @@ def build(content, destination, base_path=''):
 
         def picture(photo, full=False):
             variants = photo['variants']
-            chosen = variants[-1] if full else variants[0]
+            chosen = next(v for v in reversed(variants) if v['jpg']) if full else variants[0]
             srcset = ', '.join(f'{url(v["webp"])} {v["width"]}w' for v in variants)
             cls = 'profile-image' if full else 'photo'
             focus = photo.get('focus', [50, 50])
@@ -132,7 +141,16 @@ def build(content, destination, base_path=''):
                     f'alt="{esc(photo.get("caption", name))}" style="{style}" loading="lazy" decoding="async"></picture>')
 
         def document(path, title, body, active='', intro=False, description=''):
-            links = f'<a href="{url("")}">Top</a>' + ''.join(f'<a href="{url(slug + "/")}"' + (' aria-current="page"' if slug == active else '') + f'>{label}</a>' for slug, label in SECTIONS)
+            links = f'<a href="{url("")}">Top</a>'
+            for slug, label in SECTIONS:
+                current = ' aria-current="page"' if slug == active else ''
+                if slug == 'wandering':
+                    locations = ''.join(f'<a href="{url(a["path"])}">{esc(a["title"])}</a>' for a in albums['wandering'])
+                    links += (f'<div class="nav-group"><button class="nav-trigger" type="button" aria-expanded="false" '
+                              f'aria-controls="location-menu"{current}>{label}</button>'
+                              f'<div class="nav-menu" id="location-menu">{locations or "<span>地点整理中</span>"}</div></div>')
+                else:
+                    links += f'<a href="{url(slug + "/")}"{current}>{label}</a>'
             header = '' if intro else f'<header><a class="brand" href="{url("work/")}">{esc(name)}</a><nav aria-label="主要栏目">{links}</nav></header>'
             canonical = ''
             if config.get('siteUrl'):
@@ -156,7 +174,7 @@ def build(content, destination, base_path=''):
             if not photos:
                 return empty()
             return '<div class="grid">' + ''.join(
-                f'<a class="photo-link" data-photo data-caption="{esc(p["caption"])}" href="{url(p["variants"][-1]["jpg"])}">{picture(p)}</a>'
+                f'<a class="photo-link" data-photo data-caption="{esc(p["caption"])}" href="{url(p["full"])}">{picture(p)}</a>'
                 for p in photos) + '</div>'
 
         def subnav(entries, current=''):
@@ -171,6 +189,10 @@ def build(content, destination, base_path=''):
             if section == 'work':
                 latest = next((a for a in entries if a['photos']), entries[0] if entries else None)
                 body = '<h1>Work</h1>' + subnav(entries, latest['slug'] if latest else '') + wall(latest['photos'] if latest else [])
+            elif section == 'wandering':
+                body = f'<h1>{label}</h1>' + subnav(entries)
+                if not entries:
+                    body += empty()
             else:
                 cards = ''.join(f'<a href="{url(a["path"])}">{picture(a["coverPhoto"])}<span class="album-label">{esc(a["title"])}</span></a>'
                                 for a in entries if a['coverPhoto'])

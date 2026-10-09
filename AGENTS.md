@@ -10,3 +10,7 @@ Maintain the website in this repository. The user prefers direct local changes a
 - Run the relevant checks before publishing. Preserve remote history; do not force push or overwrite unrelated local edits.
 - `scripts/preview.py` previews local changes. `scripts/publish.py` checks and synchronizes explicitly requested updates.
 - Keep source and operating instructions current when workflows change.
+
+- Local photo sources are sibling folders Work, Wandering on Earth, Portrait. import_photos.py prepares managed public copies; never alter original sources.
+- Preview and publish prepare photos automatically; Actions builds already committed content only.
+- Wandering navigation opens a location menu, then location pages show square thumbnails and a full-ratio white viewer with side arrows and an upper-right close icon.
