@@ -151,7 +151,12 @@ def build(content, destination, base_path=''):
                               f'<div class="nav-menu" id="location-menu">{locations or "<span>地点整理中</span>"}</div></div>')
                 else:
                     links += f'<a href="{url(slug + "/")}"{current}>{label}</a>'
-            header = '' if intro else f'<header><a class="brand" href="{url("work/")}">{esc(name)}</a><nav aria-label="主要栏目">{links}</nav></header>'
+            header = '' if intro else (
+                f'<header><a class="brand" href="{url("work/")}">{esc(name)}</a>'
+                '<button class="menu-toggle" type="button" aria-label="打开导航" aria-expanded="false" '
+                'aria-controls="mobile-navigation" hidden>'
+                '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M4 7H28M4 16H28M4 25H28"/></svg></button>'
+                f'<nav id="site-navigation" aria-label="主要栏目">{links}</nav></header>')
             canonical = ''
             if config.get('siteUrl'):
                 canonical = f'<link rel="canonical" href="{esc(config["siteUrl"].rstrip("/") + url(path))}">'
