@@ -132,7 +132,7 @@ def build(content, destination, base_path=''):
                     f'alt="{esc(photo.get("caption", name))}" style="{style}" loading="lazy" decoding="async"></picture>')
 
         def document(path, title, body, active='', intro=False, description=''):
-            links = ''.join(f'<a href="{url(slug + "/")}"' + (' aria-current="page"' if slug == active else '') + f'>{label}</a>' for slug, label in SECTIONS)
+            links = f'<a href="{url("")}">Top</a>' + ''.join(f'<a href="{url(slug + "/")}"' + (' aria-current="page"' if slug == active else '') + f'>{label}</a>' for slug, label in SECTIONS)
             header = '' if intro else f'<header><a class="brand" href="{url("work/")}">{esc(name)}</a><nav aria-label="主要栏目">{links}</nav></header>'
             canonical = ''
             if config.get('siteUrl'):
