@@ -11,7 +11,7 @@ from import_photos import prepare_local
 
 def git(*args, capture=False):
     result = subprocess.run(['git', *args], cwd=ROOT, check=True, text=True,
-                            capture_output=capture, timeout=45,
+                            capture_output=capture, timeout=1800 if args[0] == 'push' else 45,
                             env={**os.environ, 'GIT_TERMINAL_PROMPT': '0'})
     return result.stdout.strip() if capture else ''
 
@@ -27,6 +27,10 @@ def main():
             raise RuntimeError('请先切换到 main 分支。')
         prepare_local()
         build(ROOT / 'content', ROOT / 'dist')
+        size = sum(p.stat().st_size for p in (ROOT / 'dist').rglob('*') if p.is_file())
+        print(f'网站大小：{size / 1_000_000:.1f} MB', flush=True)
+        if size > 1_000_000_000:
+            raise RuntimeError('网站超过 GitHub Pages 的 1 GB 上限，请先减少照片或迁移图片存储。')
         # Never force push or silently replace the current remote history.
         git('fetch', 'origin', 'main')
         if git('rev-list', '--count', 'HEAD..origin/main', capture=True) != '0':
@@ -37,7 +41,7 @@ def main():
             git('var', 'GIT_AUTHOR_IDENT', capture=True)
             git('add', '-A')
             git('commit', '-m', args.message)
-        git('push', 'origin', 'main')
+        git('push', '--progress', 'origin', 'main')
         print('已同步到 GitHub。请在 Actions 查看自动部署结果。')
     except (RuntimeError, subprocess.CalledProcessError, subprocess.TimeoutExpired) as error:
         print(f'发布未完成：{error}\n本地文件已保留。首次使用请在 VS Code 完成 GitHub 登录及 Git 作者身份设置。', file=sys.stderr)

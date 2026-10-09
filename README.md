@@ -35,7 +35,7 @@ GitHub Pages 项目：LawrenceZ0224/lawrencez-photo。线上地址：https://law
 
 ## 发布到 GitHub
 
-预览满意后运行 **网站：检查并发布到 GitHub**。流程为准备照片、构建、检查远端状态、测试、提交、推送；GitHub Actions 自动部署。首次使用需完成 GitHub 登录和 Git 作者身份设置。网络或登录失败会保留本地文件。远端有新提交时停止，请先在 VS Code 合并；不强制覆盖远端历史。
+预览满意后运行 **网站：检查并发布到 GitHub**。流程为准备照片、构建、核对 1 GB 站点容量、检查远端状态、测试、提交、推送；GitHub Actions 自动部署。第一次上传大量网页图片可能较久，之后只同步变化的内容。首次使用需完成 GitHub 登录和 Git 作者身份设置。网络或登录失败会保留本地文件。远端有新提交时停止，请先在 VS Code 合并；不强制覆盖远端历史。
 
 GitHub 仓库 Settings → Pages → Source 使用 GitHub Actions。`.github/workflows/pages.yml` 从已提交的 `content/` 构建，无需访问你电脑上的文件夹。推送 main 表示发布。GitHub Pages 上线内容与本地预览是两个不同版本，未推送的修改不会自动出现在网上。
 
