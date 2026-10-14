@@ -125,7 +125,12 @@ def build(content, destination, base_path=''):
                 if cover_name and cover_name not in [p['file'] for p in photos]:
                     raise ValueError(f'{folder}: 封面 {cover_name} 不存在')
                 cover = next((p for p in photos if p['file'] == cover_name), photos[0] if photos else None)
+                mobile_name = meta.get('mobileCover', '')
+                if mobile_name and mobile_name not in [p['file'] for p in photos]:
+                    raise ValueError(f'{folder}: 手机封面 {mobile_name} 不存在')
+                mobile_cover = next((p for p in photos if p['file'] == mobile_name), cover)
                 entries.append({**meta, 'slug': folder.name, 'photos': photos, 'coverPhoto': cover,
+                                'mobileCoverPhoto': mobile_cover,
                                 'path': f'{section}/{folder.name}/'})
             albums[section] = entries
 
@@ -140,7 +145,7 @@ def build(content, destination, base_path=''):
                     f'<img class="{cls}" src="{esc(url(chosen["jpg"]))}" width="{photo["width"]}" height="{photo["height"]}" '
                     f'alt="{esc(photo.get("caption", name))}" style="{style}" loading="lazy" decoding="async"></picture>')
 
-        def document(path, title, body, active='', intro=False, description=''):
+        def document(path, title, body, active='', intro=False, description='', page_class=''):
             links = f'<a href="{url("")}">Top</a>'
             for slug, label in SECTIONS:
                 current = ' aria-current="page"' if slug == active else ''
@@ -163,9 +168,11 @@ def build(content, destination, base_path=''):
             page = ('<!doctype html>\n' + f'<html lang="{esc(config.get("language", "zh-CN"))}"><head><meta charset="utf-8">'
                     '<meta name="viewport" content="width=device-width,initial-scale=1">'
                     f'<title>{esc(title)} · {esc(name)}</title><meta name="description" content="{esc(description or config.get("description", ""))}">'
-                    f'{canonical}<link rel="stylesheet" href="{url("assets/site.css")}"></head><body>'
+                    f'{canonical}<link rel="stylesheet" href="{url("assets/site.css")}"></head><body class="{esc(page_class)}">'
                     f'{header}<main class="{"entry" if intro else ""}">{body}</main>'
-                    f'<footer>© {esc(name)}</footer><script src="{url("assets/gallery.js")}" defer></script></body></html>')
+                    f'<footer>© {esc(name)}</footer><script src="{url("assets/gallery.js")}" defer></script>'
+                    + (f'<script src="{url("assets/portrait.js")}" defer></script>' if active == 'portrait' else '')
+                    + '</body></html>')
             output = stage / path / 'index.html' if path else stage / 'index.html'
             output.parent.mkdir(parents=True, exist_ok=True)
             output.write_text(page, encoding='utf-8')
@@ -187,6 +194,76 @@ def build(content, destination, base_path=''):
                 f'<a href="{url(a["path"])}"' + (' aria-current="page"' if a['slug'] == current else '') + f'>{esc(a["title"])}</a>'
                 for a in entries) + '</div>'
 
+        def portrait_picture(photo, mobile_photo=None, first=True, cover=False):
+            def sources(p):
+                return ', '.join(f'{url(v["webp"])} {v["width"]}w' for v in p['variants'])
+            mobile_size = f'max(100vw, {100 * mobile_photo["width"] / mobile_photo["height"]:.2f}svh)' if mobile_photo else '100vw'
+            mobile_source = (f'<source media="(max-width:700px)" type="image/webp" '
+                             f'srcset="{esc(sources(mobile_photo))}" sizes="{mobile_size}">') if mobile_photo else ''
+            fallback = next(v for v in reversed(photo['variants']) if v['jpg'])
+            focus = photo.get('focus', [50, 50])
+            mobile_focus = (mobile_photo or photo).get('focus', [50, 50])
+            style = (f'--cover-focus:{focus[0]}% {focus[1]}%;'
+                     f'--mobile-cover-focus:{mobile_focus[0]}% {mobile_focus[1]}%') if cover else ''
+            sizes = '100vw' if cover else '(max-width:700px) 90vw, 85vw'
+            return (f'<picture class="portrait-picture" style="{style}">{mobile_source}'
+                    f'<source type="image/webp" srcset="{esc(sources(photo))}" sizes="{sizes}">'
+                    f'<img src="{url(fallback["jpg"])}" width="{photo["width"]}" height="{photo["height"]}" '
+                    f'alt="{esc(photo.get("caption", name))}" loading="{"eager" if first else "lazy"}" '
+                    f'fetchpriority="{"high" if first else "low"}" decoding="async"></picture>')
+
+        def carousel_buttons(previous, following):
+            return (f'<button class="portrait-arrow portrait-prev" data-prev type="button" aria-label="{previous}" hidden>'
+                    '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M21 6L11 16L21 26"/></svg></button>'
+                    f'<button class="portrait-arrow portrait-next" data-next type="button" aria-label="{following}" hidden>'
+                    '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M11 6L21 16L11 26"/></svg></button>')
+
+        def portrait_index(entries):
+            visible = [a for a in entries if a['photos']]
+            if not visible:
+                return '<h1>Portrait</h1>' + empty()
+            cards = ''.join(
+                f'<article class="portrait-card" data-slide{" hidden" if n else ""}>'
+                f'<a class="portrait-series-link" href="{url(a["path"])}" aria-label="进入 {esc(a["title"])} 作品集">'
+                f'{portrait_picture(a["coverPhoto"], a["mobileCoverPhoto"], first=n == 0, cover=True)}'
+                f'<span class="portrait-series-title">{esc(a["title"])}</span></a></article>'
+                for n, a in enumerate(visible))
+            return ('<h1>Portrait</h1><section class="portrait-collections" data-portrait-carousel '
+                    'aria-label="人像作品集" aria-roledescription="轮播" tabindex="0">'
+                    f'<div class="portrait-cards">{cards}</div>{carousel_buttons("上一组作品", "下一组作品")}'
+                    '<p class="portrait-status" role="status"></p></section>'
+                    '<p class="portrait-index-count" data-collection-count hidden></p>'
+                    '<noscript><style>.portrait-card[hidden]{display:block}.portrait-card{margin-bottom:20px}</style></noscript>')
+
+        def portrait_album(album):
+            cover = album['coverPhoto']
+            if not cover:
+                document(album['path'], album['title'], '<h1>' + esc(album['title']) + '</h1>' + empty(), 'portrait')
+                return
+            photo_path = album['path'] + 'photos/'
+            body = ('<section class="portrait-cover">'
+                    f'{portrait_picture(cover, album["mobileCoverPhoto"], cover=True)}'
+                    '<div class="portrait-cover-shade" aria-hidden="true"></div>'
+                    f'<div class="portrait-cover-entry"><h1>{esc(album["title"])}</h1>'
+                    f'<a class="portrait-start" href="{url(photo_path)}" aria-label="开始浏览 {esc(album["title"])}">START</a></div>'
+                    f'<a class="portrait-cover-back" href="{url("portrait/")}">← Portrait</a></section>')
+            document(album['path'], album['title'], body, 'portrait', description=album.get('description', ''), page_class='portrait-cover-page')
+            photos = ''.join(f'<figure class="portrait-frame" data-slide{" hidden" if n else ""}>'
+                             f'{portrait_picture(p, first=n == 0)}</figure>' for n, p in enumerate(album['photos']))
+            body = (f'<section class="portrait-slideshow" data-portrait-carousel data-slideshow '
+                    f'aria-label="{esc(album["title"])} 作品" aria-roledescription="轮播" tabindex="0">'
+                    f'<div class="portrait-stage">{photos}{carousel_buttons("上一张", "下一张")}'
+                    '<p class="portrait-status" role="status"></p></div>'
+                    '<div class="portrait-toolbar">'
+                    f'<a class="portrait-return" href="{url("portrait/")}">← Portrait</a>'
+                    f'<div class="portrait-caption"><span>{esc(album["title"])}</span> '
+                    f'<span data-count aria-live="off">01 / {len(album["photos"]):02d}</span></div>'
+                    '<button class="portrait-play" data-play type="button" aria-label="暂停自动播放" hidden>Pause</button>'
+                    '</div></section><noscript><style>'
+                    '.portrait-reader{height:auto}.portrait-stage{display:block}.portrait-frame,.portrait-frame[hidden]{position:static;display:block;margin:32px 0}'
+                    '.portrait-frame img{height:auto;max-height:80vh}.portrait-toolbar{padding:20px}</style></noscript>')
+            document(photo_path, album['title'], body, 'portrait', description=album.get('description', ''), page_class='portrait-reader')
+
         intro = f'<div class="entry-inner"><h1 class="entry-name">{esc(name)}</h1><a class="enter-link" href="{url("work/")}">ENTER SITE</a></div>'
         document('', 'Photography', intro, intro=True)
         for section, label in SECTIONS[:3]:
@@ -199,11 +276,12 @@ def build(content, destination, base_path=''):
                 if not entries:
                     body += empty()
             else:
-                cards = ''.join(f'<a href="{url(a["path"])}">{picture(a["coverPhoto"])}<span class="album-label">{esc(a["title"])}</span></a>'
-                                for a in entries if a['coverPhoto'])
-                body = f'<h1>{label}</h1>' + (f'<div class="grid">{cards}</div>' if cards else empty())
-            document(f'{section}/', label, body, section)
+                body = portrait_index(entries)
+            document(f'{section}/', label, body, section, page_class='portrait-index' if section == 'portrait' else '')
             for album in entries:
+                if section == 'portrait':
+                    portrait_album(album)
+                    continue
                 heading = label if section == 'wandering' else album['title']
                 body = f'<h1>{esc(heading)}</h1>' + subnav(entries, album['slug'])
                 if album.get('description'):

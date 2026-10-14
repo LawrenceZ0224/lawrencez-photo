@@ -17,3 +17,77 @@
 .mobile-navigation .nav-menu a{min-height:44px;padding:8px 12px;font-size:17px;letter-spacing:.06em;line-height:1.6;white-space:normal;overflow-wrap:anywhere}
 body.menu-open{position:fixed;inset-inline:0;top:var(--menu-scroll-offset);width:100%;overflow:hidden}
 @media(max-width:700px){header.mobile-menu-ready{flex-direction:row;align-items:center;gap:12px;padding:22px 18px 22px 20px}.mobile-menu-ready .brand{font-size:25px}.menu-toggle[hidden]{display:none}}
+
+/* Portrait: collection covers, an immersive entrance, then original-ratio photographs. */
+.portrait-index main{max-width:none;padding:0 0 34px}
+.portrait-index h1{margin:52px 0 60px;font-weight:400;letter-spacing:.08em}
+.portrait-collections{position:relative}
+.portrait-card{height:clamp(360px,60svh,740px)}
+.portrait-card[hidden],.portrait-frame[hidden]{display:none}
+.portrait-series-link{display:block;position:relative;width:100%;height:100%;isolation:isolate}
+.portrait-picture{display:block;width:100%;height:100%}
+.portrait-picture img{display:block;width:100%;height:100%;object-fit:contain}
+.portrait-card .portrait-picture img,.portrait-cover .portrait-picture img{object-fit:cover;object-position:var(--cover-focus,50% 50%)}
+.portrait-series-link::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent 45%,#0003);z-index:0;pointer-events:none}
+.portrait-series-title{position:absolute;left:74%;top:50%;transform:translate(-50%,-50%);z-index:1;display:grid;place-items:center;width:min(260px,36vw);min-height:120px;padding:24px;color:white;border:1px solid #ffffffe6;font-size:20px;font-weight:400;letter-spacing:.12em;transition:background .3s;overflow-wrap:anywhere;text-align:center}
+.portrait-series-link:hover .portrait-series-title{background:#ffffff1a}
+.portrait-arrow{position:absolute;z-index:2;top:50%;transform:translateY(-50%);border:0;background:transparent;width:48px;height:48px;padding:10px;color:#666}
+.portrait-arrow[hidden]{display:none}
+.portrait-arrow svg{display:block;width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:1.1;stroke-linecap:round;stroke-linejoin:round}
+.portrait-prev{left:24px}.portrait-next{right:24px}
+.portrait-collections .portrait-arrow{border-radius:50%;color:white;background:#172d35a6}
+.portrait-collections .portrait-prev{left:5vw}.portrait-collections .portrait-next{right:5vw}
+.portrait-index-count{text-align:center;margin:24px 0 0;font-size:12px;color:var(--muted);letter-spacing:.15em}
+.portrait-status{position:absolute;bottom:12px;left:20px;right:20px;margin:0;text-align:center;font-size:13px;color:var(--muted);z-index:2}
+.portrait-status:empty{display:none}
+.portrait-collections .portrait-status{color:white;background:#0008;padding:6px}
+
+.portrait-cover-page>header{position:absolute;inset:0 0 auto;z-index:3;color:white}
+.portrait-cover-page>header nav>a,.portrait-cover-page>header .nav-trigger{color:#fff;text-shadow:0 1px 6px #0006}
+.portrait-cover-page>header nav>a[aria-current=page]{text-decoration:underline;text-underline-offset:7px;text-decoration-thickness:1px}
+.portrait-cover-page>header .nav-menu{color:var(--ink);text-shadow:none}
+.portrait-cover-page>main{max-width:none;padding:0}
+.portrait-cover-page>footer,.portrait-reader>footer{display:none}
+.portrait-cover{position:relative;height:100svh;min-height:480px;isolation:isolate;color:white}
+.portrait-cover>.portrait-picture{position:absolute;inset:0;z-index:-2}
+.portrait-cover-shade{position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,#0006,transparent 30%,transparent 65%,#0003),linear-gradient(90deg,transparent 50%,#0002)}
+.portrait-cover-entry{position:absolute;left:74%;top:61%;transform:translate(-50%,-50%);text-align:center;max-width:40%;text-shadow:0 1px 6px #0003}
+.portrait-cover-entry h1{margin:0 0 22px;font-size:30px;font-weight:400;letter-spacing:.14em;overflow-wrap:anywhere}
+.portrait-start{display:inline-block;min-height:44px;padding:10px 6px;font-size:14px;letter-spacing:.28em;text-decoration:underline;text-underline-offset:6px}
+.portrait-cover-back{position:absolute;bottom:max(28px,env(safe-area-inset-bottom));left:4vw;min-height:44px;padding:10px 0;font-size:12px;letter-spacing:.09em}
+
+.portrait-reader{height:100svh;min-height:420px;display:flex;flex-direction:column}
+.portrait-reader>header{flex:none}
+.portrait-reader>main{width:100%;max-width:none;flex:1;min-height:0;padding:0 4vw 24px}
+.portrait-slideshow{height:100%;display:flex;flex-direction:column}
+.portrait-stage{position:relative;flex:1;min-height:0;touch-action:pan-y pinch-zoom}
+.portrait-frame{position:absolute;inset:24px 96px 20px;margin:0;animation:portrait-reveal .65s ease both}
+.portrait-toolbar{display:grid;grid-template-columns:1fr auto 1fr;gap:18px;align-items:center;padding-top:10px;min-height:54px;color:#737373;font-size:12px;letter-spacing:.07em}
+.portrait-return{justify-self:start;display:inline-block;padding:12px 0;min-height:44px}
+.portrait-caption{display:flex;align-items:center;gap:20px;text-align:center}
+.portrait-caption [data-count]{font-variant-numeric:tabular-nums;font-size:11px;white-space:nowrap;color:#929292}
+.portrait-play{justify-self:end;border:0;background:none;padding:12px 0 12px 14px;min-width:44px;min-height:44px;font-size:12px;letter-spacing:.08em}
+.portrait-play[hidden]{display:none}
+@keyframes portrait-reveal{from{opacity:0}to{opacity:1}}
+@media(max-width:1100px) and (min-width:701px){.portrait-frame{inset:20px 64px}.portrait-prev{left:0}.portrait-next{right:0}.portrait-cover-entry{top:65%}}
+@media(max-width:700px){
+  .portrait-index h1{margin:30px 0 38px;font-size:29px}
+  .portrait-card{height:62svh;min-height:380px;max-height:700px}
+  .portrait-card .portrait-picture img,.portrait-cover .portrait-picture img{object-position:var(--mobile-cover-focus,50% 50%)}
+  .portrait-series-link::after{background:linear-gradient(0deg,#0005,transparent 65%)}
+  .portrait-series-title{left:50%;top:78%;width:200px;min-height:84px;font-size:19px}
+  .portrait-collections .portrait-prev{left:14px}.portrait-collections .portrait-next{right:14px}
+  .portrait-collections .portrait-arrow{width:44px;height:44px;padding:11px}
+  .portrait-cover-entry{left:50%;top:78%;max-width:80%}
+  .portrait-cover-entry h1{font-size:28px;margin-bottom:14px}
+  .portrait-cover-shade{background:linear-gradient(180deg,#0005,transparent 24%,transparent 48%,#0005)}
+  .portrait-cover-back{left:20px;bottom:max(16px,env(safe-area-inset-bottom))}
+  .portrait-reader>main{padding:0 12px max(12px,env(safe-area-inset-bottom))}
+  .portrait-frame{inset:12px 24px 18px}
+  .portrait-prev{left:-10px}.portrait-next{right:-10px}
+  .portrait-arrow{width:44px;height:44px;padding:13px}
+  .portrait-toolbar{gap:8px;padding:0 6px;font-size:11px}
+  .portrait-caption{gap:6px;flex-direction:column;line-height:1.4;max-width:42vw;overflow-wrap:anywhere}
+  .portrait-play{font-size:11px}
+}
+@media(prefers-reduced-motion:reduce){.portrait-frame{animation:none}.portrait-series-title{transition:none}}

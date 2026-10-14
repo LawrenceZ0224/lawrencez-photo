@@ -1,0 +1,30 @@
+{
+  "source": "Portrait/anqi",
+  "version": "srgb-3840-jpeg94-v2",
+  "photos": {
+    "01.jpg": {
+      "file": "000001-054661186d2be20d.jpg",
+      "hash": "054661186d2be20d263208389e7e52fe8c0a36d5e65ac7362ff266e04a7bfd6a"
+    },
+    "02.jpg": {
+      "file": "000002-a8c1145b15c1b08f.jpg",
+      "hash": "a8c1145b15c1b08fce2f4e8b98bbb575e54ba0f80fb20024896ee812f4a41d9a"
+    },
+    "03.jpg": {
+      "file": "000003-9838134943b84503.jpg",
+      "hash": "9838134943b8450347a291ee723ab7d8c45c02ca2a4a216fb44f58a27a8076a5"
+    },
+    "04.jpg": {
+      "file": "000004-a1d71061b94ebbe7.jpg",
+      "hash": "a1d71061b94ebbe724dd47ea73023dff5ffd95134f25ca2f4d59cea5e8756390"
+    },
+    "05.jpg": {
+      "file": "000005-39083a450be41666.jpg",
+      "hash": "39083a450be416662a586466a6e6e84dd65479b79c0430e2e388998296c26df6"
+    },
+    "06.jpg": {
+      "file": "000006-af502041ee26276c.jpg",
+      "hash": "af502041ee26276c77eb58898cc065da732472929c56bc6f8caa1e228f18ad12"
+    }
+  }
+}

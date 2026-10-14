@@ -116,7 +116,17 @@ def import_photos(source_root, content):
                 remap = {(old or {}).get('photos', {}).get(name, {}).get('file'): info['file'] for name, info in records.items()}
                 for field in ['captions', 'focus']:
                     meta[field] = {remap[key]: value for key, value in meta.get(field, {}).items() if key is not None and key in remap}
-                meta.update(title=album.name, cover=remap.get(meta.get('cover'), '') if meta.get('cover') else '')
+                meta['title'] = album.name
+                for field in ['cover', 'mobileCover']:
+                    # Remember source filenames, so replacing/reordering a photo keeps its cover role.
+                    source_name = meta.get(field + 'Source', '')
+                    if source_name:
+                        if not isinstance(source_name, str) or source_name not in records:
+                            raise ValueError(f'{relative}: 指定的封面 {source_name} 不存在，请更新 album.json 中的 {field}Source。')
+                        meta[field] = records[source_name]['file']
+                    elif field in meta:
+                        meta[field] = remap.get(meta[field], '') if meta[field] else ''
+                meta.setdefault('cover', '')
                 description = album / '相册介绍.txt'
                 if description.exists():
                     meta['description'] = description.read_text(encoding='utf-8')
