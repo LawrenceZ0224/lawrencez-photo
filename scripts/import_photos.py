@@ -117,7 +117,7 @@ def import_photos(source_root, content):
                 for field in ['captions', 'focus']:
                     meta[field] = {remap[key]: value for key, value in meta.get(field, {}).items() if key is not None and key in remap}
                 meta['title'] = album.name
-                for field in ['cover', 'mobileCover']:
+                for field in ['cover', 'mobileCover', 'introCover', 'mobileIntroCover']:
                     # Remember source filenames, so replacing/reordering a photo keeps its cover role.
                     source_name = meta.get(field + 'Source', '')
                     if source_name:

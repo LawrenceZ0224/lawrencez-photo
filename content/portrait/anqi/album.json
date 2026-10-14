@@ -4,6 +4,10 @@
     "000006-af502041ee26276c.jpg": [
       50,
       20
+    ],
+    "000004-a1d71061b94ebbe7.jpg": [
+      35,
+      50
     ]
   },
   "title": "anqi",
@@ -11,5 +15,7 @@
   "description": "",
   "coverSource": "06.jpg",
   "mobileCoverSource": "01.jpg",
-  "mobileCover": "000001-054661186d2be20d.jpg"
+  "mobileCover": "000001-054661186d2be20d.jpg",
+  "introCoverSource": "04.jpg",
+  "introCover": "000004-a1d71061b94ebbe7.jpg"
 }

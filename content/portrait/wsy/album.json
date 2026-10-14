@@ -1,0 +1,25 @@
+{
+  "captions": {},
+  "focus": {
+    "000004-3d3db30c3ba741c2.jpg": [
+      60,
+      55
+    ],
+    "000001-8bb897857e5cbcf5.jpg": [
+      65,
+      50
+    ],
+    "000007-d45cbef35985b70c.jpg": [
+      31,
+      70
+    ]
+  },
+  "title": "wsy",
+  "cover": "000004-3d3db30c3ba741c2.jpg",
+  "description": "",
+  "coverSource": "04.jpg",
+  "mobileCoverSource": "01.jpg",
+  "mobileCover": "000001-8bb897857e5cbcf5.jpg",
+  "introCoverSource": "07.jpg",
+  "introCover": "000007-d45cbef35985b70c.jpg"
+}

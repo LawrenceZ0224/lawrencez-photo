@@ -1,0 +1,38 @@
+{
+  "source": "Portrait/wsy",
+  "version": "srgb-3840-jpeg94-v2",
+  "photos": {
+    "01.jpg": {
+      "file": "000001-8bb897857e5cbcf5.jpg",
+      "hash": "8bb897857e5cbcf57b6b898c381106c818ccd04b155c0d1fe1b7ba3f0e7044b3"
+    },
+    "02.jpg": {
+      "file": "000002-9bccda9e1eeb35c2.jpg",
+      "hash": "9bccda9e1eeb35c2452a91341fa1519b1b049489dba8bfdfd8a9c76ba9c59cc4"
+    },
+    "03.jpg": {
+      "file": "000003-3d8d8b23f9458b78.jpg",
+      "hash": "3d8d8b23f9458b785128542ebd9610ce2e37af7df25f39bc0b1269e09afcc56f"
+    },
+    "04.jpg": {
+      "file": "000004-3d3db30c3ba741c2.jpg",
+      "hash": "3d3db30c3ba741c216e742a8172580696e3a29a1de9b74b21c916b74b8d77288"
+    },
+    "05.jpg": {
+      "file": "000005-0dc588490c799615.jpg",
+      "hash": "0dc588490c7996152687ef23e53d2e2404fb045d052e9ad63a5980d40143333a"
+    },
+    "06.jpg": {
+      "file": "000006-3fbb4353c04da920.jpg",
+      "hash": "3fbb4353c04da92004802d78fa3a82e7c608ace4fbc39ea5014dc9ef0c755674"
+    },
+    "07.jpg": {
+      "file": "000007-d45cbef35985b70c.jpg",
+      "hash": "d45cbef35985b70c104840a797a6350b7038b51c7df8999cbcb87001d84d5b69"
+    },
+    "08.jpg": {
+      "file": "000008-5a99dffeac3ff939.jpg",
+      "hash": "5a99dffeac3ff9396f86b4387280bb6ea45a5e5fce9df1f8940d5640ccfd036d"
+    }
+  }
+}

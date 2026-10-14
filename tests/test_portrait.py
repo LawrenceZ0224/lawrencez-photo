@@ -39,7 +39,7 @@ class PortraitTests(unittest.TestCase):
         self.managed = self.content / 'portrait' / 'anqi'
         self.meta_path = self.managed / 'album.json'
         meta = importer.read(self.meta_path)
-        meta.update(coverSource='06.jpg', mobileCoverSource='01.jpg')
+        meta.update(coverSource='06.jpg', mobileCoverSource='01.jpg', introCoverSource='01.jpg')
         self.meta_path.write_text(json.dumps(meta))
         importer.import_photos(self.source, self.content)
 
@@ -56,6 +56,7 @@ class PortraitTests(unittest.TestCase):
         self.assertNotEqual(before['cover'], after['cover'])
         self.assertEqual(after['cover'], records['06.jpg']['file'])
         self.assertEqual(after['mobileCover'], records['01.jpg']['file'])
+        self.assertEqual(after['introCover'], records['01.jpg']['file'])
         snapshot = {p.name: p.read_bytes() for p in self.managed.iterdir()}
         (self.album / '06.jpg').unlink()
         with self.assertRaisesRegex(ValueError, '指定的封面'):
@@ -76,6 +77,11 @@ class PortraitTests(unittest.TestCase):
         album = json.loads((output / 'manifest.json').read_text())['albums']['portrait'][0]
         self.assertEqual(album['coverPhoto']['file'], importer.read(self.meta_path)['cover'])
         self.assertEqual(album['mobileCoverPhoto']['file'], importer.read(self.meta_path)['mobileCover'])
+        self.assertEqual(album['introCoverPhoto']['file'], importer.read(self.meta_path)['introCover'])
+        self.assertEqual(album['mobileIntroCoverPhoto']['file'], album['introCoverPhoto']['file'])
+        self.assertIn(album['coverPhoto']['full'], index)
+        self.assertIn(album['introCoverPhoto']['full'], cover)
+        self.assertNotIn(album['coverPhoto']['full'], cover)
         self.assertIn('media="(max-width:700px)"', cover)
         self.assertIn(album['mobileCoverPhoto']['full'], cover)
         self.assertEqual(photos.count('class="portrait-frame"'), 2)

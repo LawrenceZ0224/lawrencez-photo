@@ -129,8 +129,17 @@ def build(content, destination, base_path=''):
                 if mobile_name and mobile_name not in [p['file'] for p in photos]:
                     raise ValueError(f'{folder}: 手机封面 {mobile_name} 不存在')
                 mobile_cover = next((p for p in photos if p['file'] == mobile_name), cover)
+                intro_name = meta.get('introCover', '')
+                mobile_intro_name = meta.get('mobileIntroCover', '')
+                for selected in [intro_name, mobile_intro_name]:
+                    if selected and selected not in [p['file'] for p in photos]:
+                        raise ValueError(f'{folder}: 全屏引入照片 {selected} 不存在')
+                intro_cover = next((p for p in photos if p['file'] == intro_name), cover)
+                mobile_intro = next((p for p in photos if p['file'] == mobile_intro_name),
+                                    intro_cover if intro_name else mobile_cover)
                 entries.append({**meta, 'slug': folder.name, 'photos': photos, 'coverPhoto': cover,
                                 'mobileCoverPhoto': mobile_cover,
+                                'introCoverPhoto': intro_cover, 'mobileIntroCoverPhoto': mobile_intro,
                                 'path': f'{section}/{folder.name}/'})
             albums[section] = entries
 
@@ -236,13 +245,13 @@ def build(content, destination, base_path=''):
                     '<noscript><style>.portrait-card[hidden]{display:block}.portrait-card{margin-bottom:20px}</style></noscript>')
 
         def portrait_album(album):
-            cover = album['coverPhoto']
+            cover = album['introCoverPhoto']
             if not cover:
                 document(album['path'], album['title'], '<h1>' + esc(album['title']) + '</h1>' + empty(), 'portrait')
                 return
             photo_path = album['path'] + 'photos/'
             body = ('<section class="portrait-cover">'
-                    f'{portrait_picture(cover, album["mobileCoverPhoto"], cover=True)}'
+                    f'{portrait_picture(cover, album["mobileIntroCoverPhoto"], cover=True)}'
                     '<div class="portrait-cover-shade" aria-hidden="true"></div>'
                     '<div class="portrait-cover-entry">'
                     f'<a class="portrait-start" href="{url(photo_path)}" aria-label="开始浏览组图">START</a></div>'
