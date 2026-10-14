@@ -224,9 +224,9 @@ def build(content, destination, base_path=''):
                 return '<h1>Portrait</h1>' + empty()
             cards = ''.join(
                 f'<article class="portrait-card" data-slide{" hidden" if n else ""}>'
-                f'<a class="portrait-series-link" href="{url(a["path"])}" aria-label="进入 {esc(a["title"])} 作品集">'
+                f'<a class="portrait-series-link" href="{url(a["path"])}" aria-label="进入第 {n + 1} 组人像作品">'
                 f'{portrait_picture(a["coverPhoto"], a["mobileCoverPhoto"], first=n == 0, cover=True)}'
-                f'<span class="portrait-series-title">{esc(a["title"])}</span></a></article>'
+                '<span class="portrait-series-title">VIEW</span></a></article>'
                 for n, a in enumerate(visible))
             return ('<h1>Portrait</h1><section class="portrait-collections" data-portrait-carousel '
                     'aria-label="人像作品集" aria-roledescription="轮播" tabindex="0">'
@@ -244,8 +244,8 @@ def build(content, destination, base_path=''):
             body = ('<section class="portrait-cover">'
                     f'{portrait_picture(cover, album["mobileCoverPhoto"], cover=True)}'
                     '<div class="portrait-cover-shade" aria-hidden="true"></div>'
-                    f'<div class="portrait-cover-entry"><h1>{esc(album["title"])}</h1>'
-                    f'<a class="portrait-start" href="{url(photo_path)}" aria-label="开始浏览 {esc(album["title"])}">START</a></div>'
+                    '<div class="portrait-cover-entry">'
+                    f'<a class="portrait-start" href="{url(photo_path)}" aria-label="开始浏览组图">START</a></div>'
                     f'<a class="portrait-cover-back" href="{url("portrait/")}">← Portrait</a></section>')
             document(album['path'], album['title'], body, 'portrait', description=album.get('description', ''), page_class='portrait-cover-page')
             photos = ''.join(f'<figure class="portrait-frame" data-slide{" hidden" if n else ""}>'

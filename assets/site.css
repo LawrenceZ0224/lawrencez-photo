@@ -29,7 +29,7 @@ body.menu-open{position:fixed;inset-inline:0;top:var(--menu-scroll-offset);width
 .portrait-picture img{display:block;width:100%;height:100%;object-fit:contain}
 .portrait-card .portrait-picture img,.portrait-cover .portrait-picture img{object-fit:cover;object-position:var(--cover-focus,50% 50%)}
 .portrait-series-link::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent 45%,#0003);z-index:0;pointer-events:none}
-.portrait-series-title{position:absolute;left:74%;top:50%;transform:translate(-50%,-50%);z-index:1;display:grid;place-items:center;width:min(260px,36vw);min-height:120px;padding:24px;color:white;border:1px solid #ffffffe6;font-size:20px;font-weight:400;letter-spacing:.12em;transition:background .3s;overflow-wrap:anywhere;text-align:center}
+.portrait-series-title{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:1;display:grid;place-items:center;width:min(260px,36vw);min-height:120px;padding:24px;color:white;border:1px solid #ffffffe6;font-size:20px;font-weight:400;letter-spacing:.12em;transition:background .3s;overflow-wrap:anywhere;text-align:center}
 .portrait-series-link:hover .portrait-series-title{background:#ffffff1a}
 .portrait-arrow{position:absolute;z-index:2;top:50%;transform:translateY(-50%);border:0;background:transparent;width:48px;height:48px;padding:10px;color:#666}
 .portrait-arrow[hidden]{display:none}
@@ -51,8 +51,7 @@ body.menu-open{position:fixed;inset-inline:0;top:var(--menu-scroll-offset);width
 .portrait-cover{position:relative;height:100svh;min-height:480px;isolation:isolate;color:white}
 .portrait-cover>.portrait-picture{position:absolute;inset:0;z-index:-2}
 .portrait-cover-shade{position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,#0006,transparent 30%,transparent 65%,#0003),linear-gradient(90deg,transparent 50%,#0002)}
-.portrait-cover-entry{position:absolute;left:74%;top:61%;transform:translate(-50%,-50%);text-align:center;max-width:40%;text-shadow:0 1px 6px #0003}
-.portrait-cover-entry h1{margin:0 0 22px;font-size:30px;font-weight:400;letter-spacing:.14em;overflow-wrap:anywhere}
+.portrait-cover-entry{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);text-align:center;max-width:40%;text-shadow:0 1px 6px #0003}
 .portrait-start{display:inline-block;min-height:44px;padding:10px 6px;font-size:14px;letter-spacing:.28em;text-decoration:underline;text-underline-offset:6px}
 .portrait-cover-back{position:absolute;bottom:max(28px,env(safe-area-inset-bottom));left:4vw;min-height:44px;padding:10px 0;font-size:12px;letter-spacing:.09em}
 
@@ -69,17 +68,16 @@ body.menu-open{position:fixed;inset-inline:0;top:var(--menu-scroll-offset);width
 .portrait-play{justify-self:end;border:0;background:none;padding:12px 0 12px 14px;min-width:44px;min-height:44px;font-size:12px;letter-spacing:.08em}
 .portrait-play[hidden]{display:none}
 @keyframes portrait-reveal{from{opacity:0}to{opacity:1}}
-@media(max-width:1100px) and (min-width:701px){.portrait-frame{inset:20px 64px}.portrait-prev{left:0}.portrait-next{right:0}.portrait-cover-entry{top:65%}}
+@media(max-width:1100px) and (min-width:701px){.portrait-frame{inset:20px 64px}.portrait-prev{left:0}.portrait-next{right:0}}
 @media(max-width:700px){
   .portrait-index h1{margin:30px 0 38px;font-size:29px}
   .portrait-card{height:62svh;min-height:380px;max-height:700px}
   .portrait-card .portrait-picture img,.portrait-cover .portrait-picture img{object-position:var(--mobile-cover-focus,50% 50%)}
   .portrait-series-link::after{background:linear-gradient(0deg,#0005,transparent 65%)}
-  .portrait-series-title{left:50%;top:78%;width:200px;min-height:84px;font-size:19px}
+  .portrait-series-title{left:50%;top:50%;width:200px;min-height:84px;font-size:19px}
   .portrait-collections .portrait-prev{left:14px}.portrait-collections .portrait-next{right:14px}
   .portrait-collections .portrait-arrow{width:44px;height:44px;padding:11px}
-  .portrait-cover-entry{left:50%;top:78%;max-width:80%}
-  .portrait-cover-entry h1{font-size:28px;margin-bottom:14px}
+  .portrait-cover-entry{left:50%;top:50%;max-width:80%}
   .portrait-cover-shade{background:linear-gradient(180deg,#0005,transparent 24%,transparent 48%,#0005)}
   .portrait-cover-back{left:20px;bottom:max(16px,env(safe-area-inset-bottom))}
   .portrait-reader>main{padding:0 12px max(12px,env(safe-area-inset-bottom))}
