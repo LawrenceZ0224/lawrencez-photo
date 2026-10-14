@@ -204,7 +204,8 @@ def build(content, destination, base_path=''):
                 body = f'<h1>{label}</h1>' + (f'<div class="grid">{cards}</div>' if cards else empty())
             document(f'{section}/', label, body, section)
             for album in entries:
-                body = f'<h1>{esc(album["title"])}</h1>' + subnav(entries, album['slug'])
+                heading = label if section == 'wandering' else album['title']
+                body = f'<h1>{esc(heading)}</h1>' + subnav(entries, album['slug'])
                 if album.get('description'):
                     body += f'<p class="description">{esc(album["description"])}</p>'
                 body += wall(album['photos'])
