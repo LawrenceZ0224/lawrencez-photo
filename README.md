@@ -4,7 +4,7 @@ GitHub Pages 项目：LawrenceZ0224/lawrencez-photo。线上地址：https://law
 
 ## 日常照片管理
 
-用 VS Code 打开 `/Users/lawrencez/Desktop/个人网站/code`。照片放在 code 外的同级文件夹，不必手动编写相册配置：
+用 VS Code 打开“个人网站”中的 `code` 文件夹（当前位置：`/Users/lawrencez/Downloads/同步空间/个人网站/code`）。照片放在 code 外的同级文件夹，不必手动编写相册配置：
 
 ```text
 个人网站/
