@@ -67,10 +67,10 @@ class PortraitTests(unittest.TestCase):
         output = self.root / 'dist'
         builder.build(self.content, output, '/lawrencez-photo')
         index = (output / 'portrait/index.html').read_text()
-        cover = (output / 'portrait/anqi/index.html').read_text()
-        photos = (output / 'portrait/anqi/photos/index.html').read_text()
-        self.assertIn('href="/lawrencez-photo/portrait/anqi/"', index)
-        self.assertIn('href="/lawrencez-photo/portrait/anqi/photos/"', cover)
+        cover = (output / 'portrait/01/index.html').read_text()
+        photos = (output / 'portrait/01/photos/index.html').read_text()
+        self.assertIn('href="/lawrencez-photo/portrait/01/"', index)
+        self.assertIn('href="/lawrencez-photo/portrait/01/photos/"', cover)
         self.assertIn('href="/lawrencez-photo/portrait/"', photos)
         self.assertIn('href="/lawrencez-photo/"', cover)  # Top
         self.assertIn('src="/lawrencez-photo/assets/portrait.js"', photos)
@@ -87,7 +87,7 @@ class PortraitTests(unittest.TestCase):
         self.assertEqual(photos.count('class="portrait-frame"'), 2)
         self.assertLess(photos.index(album['photos'][0]['full']), photos.index(album['photos'][1]['full']))
         self.assertNotIn('data-photo ', photos)  # The photo wall lightbox must not intercept the slideshow.
-        self.assertIn('/lawrencez-photo/portrait/anqi/photos/', (output / 'sitemap.xml').read_text())
+        self.assertIn('/lawrencez-photo/portrait/01/photos/', (output / 'sitemap.xml').read_text())
 
 
 if __name__ == '__main__':

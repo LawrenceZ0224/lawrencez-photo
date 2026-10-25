@@ -108,3 +108,64 @@ body.menu-open{position:fixed;inset-inline:0;top:var(--menu-scroll-offset);width
   .portfolio-featured{width:100%}
   .portfolio-card h2{font-size:clamp(18px,5.2vw,24px);left:16px;right:16px;letter-spacing:.14em}
 }
+
+
+/* Collection directories and their shared Portfolio entrance. */
+.visually-hidden{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.portfolio-link{display:block;position:relative;width:100%;height:100%}
+.portfolio-link:focus-visible{outline-offset:-4px;outline-width:3px}
+.series-index main{max-width:1600px;width:92%;padding:78px 0 70px}
+.series-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:54px 34px}
+.series-card a{display:block}
+.series-card .portrait-picture{height:auto;aspect-ratio:3/2}
+.series-card .portrait-picture img{object-fit:cover;object-position:var(--cover-focus,50% 50%)}
+.series-card h2{margin:16px 0 0;text-align:center;font-size:14px;line-height:1.7;font-weight:400;text-decoration:underline;text-underline-offset:3px}
+
+/* Film: complete photographs, with a square thumbnail strip below. */
+.film-reader main{width:100%;max-width:1500px;padding:0 28px 40px}
+.film-reader h1{margin:24px 0 22px;font-size:18px;font-weight:400;letter-spacing:.08em}
+.film-stage{position:relative;height:clamp(320px,calc(100svh - 330px),800px)}
+.film-frame{position:absolute;inset:0 80px;margin:0}
+.film-frame[hidden]{display:none}
+.film-frame .portrait-picture img{object-fit:contain}
+.film-thumbnails{overflow-x:auto;padding:6px 4px;scrollbar-width:thin;overscroll-behavior-x:contain;margin:36px auto 0;max-width:1100px}
+.film-thumbnail-track{display:flex;gap:10px;width:max-content;margin-inline:auto}
+.film-thumbnail{border:0;padding:0;background:none;flex:0 0 72px;width:72px;height:72px;opacity:.42}
+.film-thumbnail picture,.film-thumbnail img{display:block;width:100%;height:100%;object-fit:cover}
+.film-thumbnail[aria-current=true]{opacity:1;outline:1px solid #555;outline-offset:3px}
+.film-thumbnail:focus-visible{outline:2px solid var(--active);outline-offset:3px;opacity:1}
+.film-counter{text-align:center;margin:14px 0 0;font-size:12px;letter-spacing:.1em;color:var(--muted)}
+.film-return{display:inline-block;margin:16px 0 0;font-size:13px;letter-spacing:.08em;color:var(--muted)}
+.film-feedback{text-align:center;color:var(--muted);font-size:13px;margin-top:12px}
+.film-feedback:has([data-film-status]:empty){display:none}
+.film-feedback button{border:0;background:transparent;text-decoration:underline;margin-left:10px;padding:8px}
+
+/* Profile: quiet gray field, uncropped portrait, and an empty writing panel. */
+.profile-page{min-height:100svh;display:flex;flex-direction:column}
+.profile-page header{background:white}
+.profile-page main{max-width:none;width:100%;padding:0;background:#d5d4d4;flex:1;display:flex}
+.profile-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(280px,390px);gap:70px;max-width:1180px;width:100%;margin:0 auto;padding:36px 40px;min-height:calc(100svh - 190px);align-items:center}
+.profile-portrait{display:flex;justify-content:center;align-items:center;min-width:0}
+.profile-portrait picture{display:flex;justify-content:center;max-width:100%}
+.profile-portrait img{display:block;width:auto;height:auto;max-width:100%;max-height:min(66svh,640px);object-fit:contain}
+.profile-bio{align-self:start;min-height:280px;padding:28px 30px;background:white;overflow-wrap:anywhere}
+.profile-bio:empty{min-height:280px}
+.profile-bio p:last-child{margin-bottom:0}
+.profile-page footer{background:white}
+@media(max-width:1100px){.profile-layout{gap:36px;padding-inline:32px}.series-index main{padding-top:52px}}
+@media(max-width:900px){.series-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:36px 24px}}
+@media(max-width:700px){
+  .profile-layout{grid-template-columns:minmax(0,1fr);gap:28px;min-height:0;padding:32px 20px 40px}
+  .profile-portrait img{width:100%;max-height:none}
+  .profile-bio,.profile-bio:empty{min-height:260px;padding:24px}
+  .series-index main{width:calc(100% - 40px);padding-top:38px}
+  .film-reader main{padding:0 12px 30px}
+  .film-reader h1{font-size:15px;margin:18px 0 24px}
+  .film-stage{height:clamp(210px,calc((100vw - 84px)*var(--film-photo-ratio,1)),66svh)}
+  .film-frame{inset:0 30px}
+  .film-stage .portrait-prev{left:-8px}.film-stage .portrait-next{right:-8px}
+  .film-thumbnails{margin-top:28px}
+  .film-thumbnail{flex-basis:56px;width:56px;height:56px}
+  .film-thumbnail-track{gap:8px}
+}
+@media(max-width:500px){.series-grid{grid-template-columns:minmax(0,1fr)}}

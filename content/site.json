@@ -3,7 +3,7 @@
   "language": "zh-CN",
   "description": "个人摄影作品与随笔",
   "profile": "",
-  "profilePhoto": "",
+  "profilePhoto": "profile/photo.jpg",
   "notes": "",
   "email": "",
   "siteUrl": "https://lawrencez0224.github.io",
@@ -35,6 +35,15 @@
         50,
         75
       ]
+    },
+    "film": {
+      "album": "film/autumn-in-bupt-2025-c7a2ad38",
+      "source": "03.JPG",
+      "focus": [
+        50,
+        50
+      ]
     }
-  }
+  },
+  "profilePhotoSource": "微信图片_20261025221057_130_8.jpg"
 }

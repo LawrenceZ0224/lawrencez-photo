@@ -12,7 +12,7 @@ from import_photos import prepare_local, SECTIONS
 
 def fingerprint():
     paths = list((ROOT / 'scripts').glob('*.py'))
-    for name in SECTIONS:
+    for name in [*SECTIONS, 'Profile']:
         folder = ROOT.parent / name
         if folder.exists():
             paths.append(folder)

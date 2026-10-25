@@ -95,7 +95,7 @@ def build(content, destination, base_path=''):
     try:
         shutil.copytree(ROOT / 'assets', stage / 'assets')
         albums = {}
-        for section, _ in SECTIONS[:3]:
+        for section, _ in [*SECTIONS[:3], ("film", "Film")]:
             entries = []
             source = content / section
             for folder in sorted(source.iterdir() if source.exists() else [], key=lambda p: natural_key(p.name), reverse=section == 'work'):
@@ -140,7 +140,7 @@ def build(content, destination, base_path=''):
                 entries.append({**meta, 'slug': folder.name, 'photos': photos, 'coverPhoto': cover,
                                 'mobileCoverPhoto': mobile_cover,
                                 'introCoverPhoto': intro_cover, 'mobileIntroCoverPhoto': mobile_intro,
-                                'path': f'{section}/{folder.name}/'})
+                                'path': f'{section}/{folder.name}/', 'sourcePath': f'{section}/{folder.name}/'})
             if section == 'portrait':
                 preferred = config.get('portraitOrder', [])
                 if (not isinstance(preferred, list) or
@@ -149,6 +149,14 @@ def build(content, destination, base_path=''):
                     raise ValueError('portraitOrder 必须是不重复的作品集文件夹名称列表')
                 positions = {slug: n for n, slug in enumerate(preferred)}
                 entries.sort(key=lambda album: positions.get(album['slug'], len(positions)))
+                for n, album in enumerate(entries, 1):
+                    title = album.get('catalogTitle') or f'Series {n:02d}'
+                    for photo in album['photos']:
+                        if photo['caption'] == album['title']:
+                            photo['caption'] = title
+                    album['title'] = title
+                    album['path'] = f'portrait/{n:02d}/'
+
             albums[section] = entries
 
         def picture(photo, full=False):
@@ -164,7 +172,7 @@ def build(content, destination, base_path=''):
 
         def document(path, title, body, active='', intro=False, description='', page_class=''):
             links = f'<a href="{url("")}">Top</a>'
-            for slug, label in [("portfolio", "Portfolio"), *SECTIONS]:
+            for slug, label in [("portfolio", "Portfolio"), *[s for s in SECTIONS if s[0] != "work"]]:
                 current = ' aria-current="page"' if slug == active else ''
                 if slug == 'wandering':
                     locations = ''.join(f'<a href="{url(a["path"])}">{esc(a["title"])}</a>' for a in albums['wandering'])
@@ -174,7 +182,7 @@ def build(content, destination, base_path=''):
                 else:
                     links += f'<a href="{url(slug + "/")}"{current}>{label}</a>'
             header = '' if intro else (
-                f'<header><a class="brand" href="{url("work/")}">{esc(name)}</a>'
+                f'<header><a class="brand" href="{url("portfolio/")}">{esc(name)}</a>'
                 '<button class="menu-toggle" type="button" aria-label="打开导航" aria-expanded="false" '
                 'aria-controls="mobile-navigation" hidden>'
                 '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M4 7H28M4 16H28M4 25H28"/></svg></button>'
@@ -189,12 +197,25 @@ def build(content, destination, base_path=''):
                     f'{header}<main class="{"entry" if intro else ""}">{body}</main>'
                     f'<footer>© {esc(name)}</footer><script src="{url("assets/gallery.js")}" defer></script>'
                     + (f'<script src="{url("assets/portrait.js")}" defer></script>' if active == 'portrait' else '')
+                    + (f'<script src="{url("assets/film.js")}" defer></script>' if page_class == 'film-reader' else '')
                     + '</body></html>')
             output = stage / path / 'index.html' if path else stage / 'index.html'
             output.parent.mkdir(parents=True, exist_ok=True)
             output.write_text(page, encoding='utf-8')
             pages.append(path)
             return page
+
+        def redirect(old_path, new_path):
+            target = url(new_path)
+            canonical = config.get('siteUrl', '').rstrip('/') + target
+            page = ('<!doctype html><html lang="zh-CN"><head><meta charset="utf-8">'
+                    f'<meta http-equiv="refresh" content="0;url={esc(target)}">'
+                    f'<link rel="canonical" href="{esc(canonical)}"><meta name="robots" content="noindex">'
+                    f'<title>Portrait · {esc(name)}</title></head>'
+                    f'<body><a href="{esc(target)}">进入作品集</a></body></html>')
+            output = stage / old_path / 'index.html'
+            output.parent.mkdir(parents=True, exist_ok=True)
+            output.write_text(page, encoding='utf-8')
 
         def empty():
             return '<p class="empty">作品整理中</p>'
@@ -286,12 +307,12 @@ def build(content, destination, base_path=''):
             if not selection:
                 return None
             album = next((a for entries in albums.values() for a in entries
-                          if a['path'].rstrip('/') == selection['album']), None)
+                          if a['sourcePath'].rstrip('/') == selection['album']), None)
             if album is None:
                 raise ValueError(f'Portfolio: 找不到相册 {selection["album"]}')
             # Resolve the original filename against the latest import, so inserting
             # or replacing photos does not break the Portfolio cover selection.
-            record = content / album['path'] / '_photo-import.json'
+            record = content / album['sourcePath'] / '_photo-import.json'
             records = read_json(record)['photos'] if record.exists() else {}
             filename = records.get(selection['source'], {}).get('file', selection['source'])
             photo = next((p for p in album['photos'] if p['file'] == filename), None)
@@ -321,9 +342,12 @@ def build(content, destination, base_path=''):
                          f'fetchpriority="{"high" if featured else "auto"}" decoding="async"></picture>')
             else:
                 classes += ' portfolio-placeholder'
-            # Display-only cards deliberately have no link, button or click handler.
-            return (f'<article class="{classes}" aria-labelledby="portfolio-{key}">'
-                    f'{media}<h2 id="portfolio-{key}">{esc(label)}</h2></article>')
+            destinations = {'photoset': 'photoset/', 'portrait': 'portrait/',
+                            'wandering': 'wandering/', 'film': 'film/'}
+            contents = f'{media}<h2 id="portfolio-{key}">{esc(label)}</h2>'
+            if key in destinations:
+                contents = f'<a class="portfolio-link" href="{url(destinations[key])}" aria-labelledby="portfolio-{key}">{contents}</a>'
+            return f'<article class="{classes}" aria-labelledby="portfolio-{key}">{contents}</article>'
 
         portfolio = '<h1 class="portfolio-heading">Portfolio</h1><div class="portfolio-layout">'
         portfolio += portfolio_card('photoset', 'Photoset', featured=True)
@@ -334,7 +358,7 @@ def build(content, destination, base_path=''):
         portfolio += '</div>'
         document('portfolio/', 'Portfolio', portfolio, 'portfolio', page_class='portfolio-page')
 
-        intro = f'<div class="entry-inner"><h1 class="entry-name">{esc(name)}</h1><a class="enter-link" href="{url("work/")}">ENTER SITE</a></div>'
+        intro = f'<div class="entry-inner"><h1 class="entry-name">{esc(name)}</h1><a class="enter-link" href="{url("portfolio/")}">ENTER SITE</a></div>'
         document('', 'Photography', intro, intro=True)
         for section, label in SECTIONS[:3]:
             entries = albums[section]
@@ -351,6 +375,11 @@ def build(content, destination, base_path=''):
             for album in entries:
                 if section == 'portrait':
                     portrait_album(album)
+                    legacy = album['sourcePath']
+                    if legacy != album['path'] and legacy not in {a['path'] for a in entries}:
+                        redirect(legacy, album['path'])
+                        if album['photos']:
+                            redirect(legacy + 'photos/', album['path'] + 'photos/')
                     continue
                 heading = label if section == 'wandering' else album['title']
                 body = f'<h1>{esc(heading)}</h1>' + subnav(entries, album['slug'])
@@ -359,20 +388,65 @@ def build(content, destination, base_path=''):
                 body += wall(album['photos'])
                 document(album['path'], album['title'], body, section, description=album.get('description', ''))
 
-        profile = '<h1>Profile</h1><div class="profile">'
+        def series_catalog(entries, title, portrait_series=False):
+            cards = []
+            for n, album in enumerate(a for a in entries if a['photos']):
+                label = album.get('catalogTitle') or (f'Series {n + 1:02d}' if portrait_series else album['title'])
+                cover = album['coverPhoto']
+                cards.append(f'<article class="series-card"><a href="{url(album["path"])}">'
+                             f'{portrait_picture(cover, first=n == 0, cover=True)}'
+                             f'<h2>{esc(label)}</h2></a></article>')
+            return f'<h1 class="visually-hidden">{title}</h1><div class="series-grid">' + ''.join(cards) + '</div>'
+
+        document('photoset/', 'Photoset', series_catalog(albums['portrait'], 'Photoset', True),
+                 'portfolio', page_class='series-index')
+        document('film/', 'Film', series_catalog(albums['film'], 'Film'), 'portfolio', page_class='series-index')
+        for album in albums['film']:
+            photos = album['photos']
+            if not photos:
+                document(album['path'], album['title'], f'<h1>{esc(album["title"])}</h1>' + empty(), 'portfolio')
+                continue
+            frames = ''.join(f'<figure class="film-frame" data-film-frame{" hidden" if n else ""}>'
+                             f'{portrait_picture(p, first=n == 0)}</figure>' for n, p in enumerate(photos))
+            thumbs = ''.join(f'<button class="film-thumbnail" type="button" data-film-thumb="{n}" '
+                             f'aria-label="查看第 {n + 1} 张" aria-current="{"true" if n == 0 else "false"}">'
+                             f'{picture({**p, "caption": ""})}</button>' for n, p in enumerate(photos))
+            body = (f'<h1>{esc(album["title"])}</h1><section class="film-gallery" data-film-gallery '
+                    f'aria-label="{esc(album["title"])} 组图" tabindex="0" style="--film-photo-ratio:{photos[0]["height"] / photos[0]["width"]:.6f}">'
+                    f'<div class="film-stage">{frames}'
+                    '<button type="button" class="portrait-arrow portrait-prev" data-film-prev aria-label="上一张">'
+                    '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M21 6L11 16L21 26"/></svg></button>'
+                    '<button type="button" class="portrait-arrow portrait-next" data-film-next aria-label="下一张">'
+                    '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M11 6L21 16L11 26"/></svg></button></div>'
+                    '<div class="film-feedback" role="status"><span data-film-status></span>'
+                    '<button type="button" data-film-retry hidden>重新加载</button></div>'
+                    f'<div class="film-thumbnails" aria-label="照片缩略图"><div class="film-thumbnail-track">{thumbs}</div></div>'
+                    f'<p class="film-counter" data-film-count aria-live="polite">01 / {len(photos):02d}</p></section>'
+                    f'<a class="film-return" href="{url("film/")}">← Film</a>'
+                    '<noscript><style>.film-stage{height:auto}.film-frame,.film-frame[hidden]{position:static;display:block;margin:30px 0}'
+                    '.film-frame img{height:auto}.film-thumbnails,.film-stage button{display:none}</style></noscript>')
+            document(album['path'], album['title'], body, 'portfolio', page_class='film-reader')
+
+        profile = '<h1 class="visually-hidden">Profile</h1><div class="profile-layout"><div class="profile-portrait">'
         if config.get('profilePhoto'):
             source = (content / config['profilePhoto']).resolve()
             if content.resolve() not in source.parents:
                 raise ValueError('个人照片必须位于content文件夹内')
-            profile += picture({**photo_variants(source, stage), 'caption': name}, full=True)
-        profile += text_body(config.get('profile', ''))
+            photo = photo_variants(source, stage)
+            variants = photo['variants']
+            fallback = next(v for v in reversed(variants) if v['jpg'])
+            srcset = ', '.join(f'{url(v["webp"])} {v["width"]}w' for v in variants)
+            profile += (f'<picture><source type="image/webp" srcset="{esc(srcset)}" sizes="(max-width:700px) calc(100vw - 40px), 550px">'
+                        f'<img src="{url(fallback["jpg"])}" width="{photo["width"]}" height="{photo["height"]}" '
+                        f'alt="{esc(name)}" loading="eager" fetchpriority="high" decoding="async"></picture>')
+        profile += '</div><section class="profile-bio" aria-label="个人介绍">'
+        if config.get('profile'):
+            profile += text_body(config['profile'])
         if config.get('notes'):
             profile += text_body(config['notes'])
         if config.get('email'):
             profile += f'<p><a href="mailto:{esc(quote(config["email"], safe="@.+-"))}">{esc(config["email"])}</a></p>'
-        if not any(config.get(k) for k in ['profilePhoto', 'profile', 'notes', 'email']):
-            profile += '<p class="empty">个人介绍整理中</p>'
-        document('profile/', 'Profile', profile + '</div>', 'profile')
+        document('profile/', 'Profile', profile + '</section></div>', 'profile', page_class='profile-page')
         posts = []
         for path in sorted((content / 'journal').glob('*.json')):
             meta = read_json(path)
@@ -391,7 +465,7 @@ def build(content, destination, base_path=''):
         (stage / 'manifest.json').write_text(json.dumps({'albums': albums, 'posts': posts}, ensure_ascii=False, indent=2), encoding='utf-8')
         (stage / '.nojekyll').touch()
         (stage / '.photography-build').touch()
-        not_found = document('404/', '页面未找到', f'<h1>页面未找到</h1><p class="empty"><a href="{url("work/")}">返回作品</a></p>')
+        not_found = document('404/', '页面未找到', f'<h1>页面未找到</h1><p class="empty"><a href="{url("portfolio/")}">返回 Portfolio</a></p>')
         (stage / '404.html').write_text(not_found, encoding='utf-8')
         if config.get('siteUrl'):
             origin = config['siteUrl'].rstrip('/')

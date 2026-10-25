@@ -1,0 +1,58 @@
+{
+  "source": "Film/Autumn in BUPT 2025",
+  "version": "srgb-3840-jpeg94-v2",
+  "photos": {
+    "01.JPG": {
+      "file": "000001-7969807ee8ae5a4e.jpg",
+      "hash": "7969807ee8ae5a4e834d8a31f6eea1f9b505c87169cf0720b81b8fde8aaeac69"
+    },
+    "02.JPG": {
+      "file": "000002-dcf261fb18a3f207.jpg",
+      "hash": "dcf261fb18a3f2075519421d790e9fbd29f6e5d8f787ae75e71f828025f953cd"
+    },
+    "03.JPG": {
+      "file": "000003-67c3e655a5ee82db.jpg",
+      "hash": "67c3e655a5ee82dbc952ecc0a49e84a20a6bb9783cd7556e9675b4374c3c60ea"
+    },
+    "04.JPG": {
+      "file": "000004-0513e09530f8d428.jpg",
+      "hash": "0513e09530f8d42861db189f0b79c51569ddfaddde8f4873d4ddd4018af2774a"
+    },
+    "05.JPG": {
+      "file": "000005-ab9a03bf1c1b63b4.jpg",
+      "hash": "ab9a03bf1c1b63b4e2c3cc096f8b4c4ca944230259436a716cb48bf15a6af607"
+    },
+    "06.JPG": {
+      "file": "000006-f5fc9fa7d8978eb8.jpg",
+      "hash": "f5fc9fa7d8978eb8d4cd3e0d390b4430d69e6d8aa3985ecf7c3afef480775e72"
+    },
+    "07.JPG": {
+      "file": "000007-fb0618994241dc9f.jpg",
+      "hash": "fb0618994241dc9fe0cc40ecd5b207edb4a8ee7ab4bae41f0febaeb38bc037f2"
+    },
+    "08.JPG": {
+      "file": "000008-307e3437af12d414.jpg",
+      "hash": "307e3437af12d4145bdc7a14ed29bbcced695db7b3e4af69a6e3e07068c3f8bd"
+    },
+    "09.JPG": {
+      "file": "000009-4c1bda93fdaf7908.jpg",
+      "hash": "4c1bda93fdaf79086c40ed16109aed8975a775f0e6bf858109be5c0c3448fba2"
+    },
+    "10.JPG": {
+      "file": "000010-f75a014c372218b2.jpg",
+      "hash": "f75a014c372218b282cd1332d8255b8bba8bd69d899a585ab6918d528d722123"
+    },
+    "11.JPG": {
+      "file": "000011-28c5eda32814c94f.jpg",
+      "hash": "28c5eda32814c94fe205f3a30ad81d1327313051601bd43da595bd90ab4c26d0"
+    },
+    "12.JPG": {
+      "file": "000012-a155a65031846fda.jpg",
+      "hash": "a155a65031846fda6e827fc4a79751e7a6b4e711e72c56b3998305f032fb364d"
+    },
+    "13.JPG": {
+      "file": "000013-1e7afc4db9cf00d0.jpg",
+      "hash": "1e7afc4db9cf00d012ee8b32bbc7fd5ee0eaea7e9e99936d60d2ab24c2710a2e"
+    }
+  }
+}

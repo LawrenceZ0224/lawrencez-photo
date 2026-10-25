@@ -1,6 +1,6 @@
 # LawrenceZ 摄影网站
 
-GitHub Pages 项目：LawrenceZ0224/lawrencez-photo。线上地址：https://lawrencez0224.github.io/lawrencez-photo/ 。导航为 Top、Portfolio、Work、Wandering on Earth、Portrait、Profile、Journal。Top 返回白底入口。
+GitHub Pages 项目：LawrenceZ0224/lawrencez-photo。线上地址：https://lawrencez0224.github.io/lawrencez-photo/ 。导航为 Top、Portfolio、Wandering on Earth、Portrait、Profile、Journal。Top 返回白底入口，ENTER SITE 进入 Portfolio；Work 已从导航移除，原有内容保留。
 
 ## 日常照片管理
 
@@ -14,6 +14,9 @@ GitHub Pages 项目：LawrenceZ0224/lawrencez-photo。线上地址：https://law
 │   └── Italy/                 按地点分类，支持中文文件夹名
 ├── Portrait/
 │   └── 主题名称/               按人物或拍摄项目分类
+├── Film/
+│   └── Autumn in BUPT 2025/   胶片作品集
+├── Profile/                  个人照片
 └── code/                      网站代码和自动准备的公开副本
 ```
 
@@ -25,17 +28,21 @@ GitHub Pages 项目：LawrenceZ0224/lawrencez-photo。线上地址：https://law
 
 照片墙采用 1:1 方形缩略图，默认居中裁切。点击缩略图打开白底高清大图，大图保留原比例；左右箭头切换，右上角 × 关闭，支持键盘左右键、Esc 和手机横向滑动。关闭后保留照片墙滚动位置。
 
-## Portfolio 展示页
+## Portfolio 与作品集目录
 
-导航中的 Portfolio 打开 `/portfolio/`。顶部为居中的 Photoset 大图；下方左右两栏依次为 Portrait / Wandering on Earth、Film / Landscape。手机端按同样顺序改为单栏。当前所有分类卡片仅展示，不跳转、不打开大图；Film、Landscape 只保留浅色背景和栏目标题。
+导航中的 Portfolio 打开 `/portfolio/`。顶部为居中的 Photoset 大图；下方左右两栏依次为 Portrait / Wandering on Earth、Film / Landscape。手机端按同样顺序改为单栏。Photoset、Portrait、Wandering on Earth、Film 卡片分别进入对应页面；Landscape 仍保留空白位置，不跳转。
 
-封面在 `content/site.json` 的 `portfolioCovers` 中指定：Photoset 使用 `Portrait/wsy/01.jpg`，Portrait 使用 `Portrait/anqi/01.jpg`，Wandering on Earth 使用 `Wandering on Earth/Italy/IMG_20250325_183512-77.jpg`。`album` 是 content 下的相册路径，`source` 填原照片文件名，`focus` 控制本页裁切位置。封面复用已有公开图片，不重复复制原片，也不改变原有人像作品集封面；导入后按原文件名追踪。移除指定照片前应先更换封面设置，避免构建中断。
+封面在 `content/site.json` 的 `portfolioCovers` 中指定：Photoset 使用 `Portrait/wsy/01.jpg`，Portrait 使用 `Portrait/anqi/01.jpg`，Wandering on Earth 使用 `Wandering on Earth/Italy/IMG_20250325_183512-77.jpg`。Film 使用 `Film/Autumn in BUPT 2025/03.JPG`。`album` 是 content 下的相册路径，`source` 填原照片文件名，`focus` 控制本页裁切位置。封面复用已有公开图片，不重复复制原片，也不改变原有人像作品集封面；导入后按原文件名追踪。移除指定照片前应先更换封面设置，避免构建中断。
+
+Photoset 与 Film 目录在电脑上每行显示三个作品集，封面下方显示作品名称；窄屏自动变为两栏或单栏。Photoset 复用现有人像作品集，顺序仍为 wsy、anqi；目前以 Series 01、Series 02 显示，避免暴露文件夹名称，可在对应 `album.json` 添加 `catalogTitle` 指定正式作品名称。
+
+Film 第一个作品集是 Autumn in BUPT 2025，目录封面使用 `01.JPG`（在其 `album.json` 设置 `coverSource`）。点击进入后显示原比例大图、左右箭头与底部 1:1 缩略图。点击缩略图、键盘左右键或手机横滑均可切换；当前缩略图高亮，滚动缩略图条不会改变整页位置。不自动播放。后续在 Film 下新建作品集文件夹即可自动导入。Film 为可选来源目录，缺失整个 Film 目录时保留已导入内容。
 
 ## 人像作品集
 
 Portrait 采用“作品集选择 → 全屏封面 → START 进入组图”的三层浏览。作品集入口使用居中的 VIEW，全屏封面入口使用居中的 START，入口不展示本地文件夹名。电脑使用横幅封面，手机可以单独指定竖幅封面；导航一直可用。只有一组作品时不显示切换作品集的箭头。增加 `Portrait/主题名称/` 文件夹并放入照片，预览、发布时就会自动增加作品集。
 
-作品集按 `content/site.json` 中的 `portraitOrder` 排序，目前为 `["wsy", "anqi"]`：wsy 是第 01 组，anqi 是第 02 组。以后新增且未指定顺序的作品集会按文件夹名排在后面；无需重命名照片文件夹。组图底部只显示照片序号，不显示文件夹名称。
+作品集按 `content/site.json` 中的 `portraitOrder` 排序，目前为 `["wsy", "anqi"]`：wsy 是第 01 组，anqi 是第 02 组；公开地址分别是 `/portrait/01/`、`/portrait/02/`，详细组图在对应的 `photos/` 下。旧文件夹名称链接自动转到编号地址，不列入站点地图。以后新增且未指定顺序的作品集会按文件夹名排在后面；无需重命名照片文件夹。组图底部只显示照片序号，不显示文件夹名称。
 
 列表封面与第二层全屏引入可以分开设置：
 
@@ -66,7 +73,8 @@ GitHub 仓库 Settings → Pages → Source 使用 GitHub Actions。`.github/wor
 
 ## 个人介绍与随笔
 
-- `content/site.json`：署名、简介、碎碎念、公开邮箱；`profilePhoto` 可填写 `profile/me.jpg` 并放入对应照片。
+- Profile 使用浅灰背景，电脑端左侧原比例照片上下居中、右侧为白色介绍框；手机端先照片、后介绍框。介绍框暂时完全留白。
+- `content/site.json`：`profile`、`notes`、`email` 可在之后填写介绍、碎碎念与公开邮箱。`profilePhotoSource` 指定同级 Profile 文件夹中的照片文件名，导入工具自动生成 `content/profile/photo.jpg`，由 `profilePhoto` 引用。替换同名照片后，预览和发布会自动更新，原文件不被修改。
 - `content/journal/article-name.json`：随笔，文件名使用英文、数字、短横线。
 
 ```json

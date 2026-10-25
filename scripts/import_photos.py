@@ -11,7 +11,8 @@ import tempfile
 from PIL import Image, ImageCms, ImageOps
 
 ROOT = Path(__file__).resolve().parents[1]
-SECTIONS = {'Work': 'work', 'Wandering on Earth': 'wandering', 'Portrait': 'portrait'}
+SECTIONS = {'Work': 'work', 'Wandering on Earth': 'wandering', 'Portrait': 'portrait', 'Film': 'film'}
+REQUIRED_SECTIONS = ('Work', 'Wandering on Earth', 'Portrait')
 FORMATS = {'.jpg', '.jpeg', '.png', '.webp', '.tif', '.tiff'}
 MARKER = '_photo-import.json'
 VERSION = 'srgb-3840-jpeg94-v2'
@@ -60,7 +61,7 @@ def export_photo(source, target):
 
 def import_photos(source_root, content):
     source_root, content = Path(source_root), Path(content)
-    if not all((source_root / name).is_dir() for name in SECTIONS):
+    if not all((source_root / name).is_dir() for name in REQUIRED_SECTIONS):
         raise ValueError('照片根目录必须包含 Work、Wandering on Earth、Portrait 三个文件夹；停止导入以免误移除相册。')
     content.mkdir(parents=True, exist_ok=True)
     stage = Path(tempfile.mkdtemp(prefix='.photo-import-', dir=content.parent))
@@ -68,6 +69,8 @@ def import_photos(source_root, content):
     try:
         for folder_name, section in SECTIONS.items():
             section_root = source_root / folder_name
+            if not section_root.exists() and folder_name not in REQUIRED_SECTIONS:
+                continue
             for album in sorted(section_root.iterdir(), key=lambda p: natural_key(p.name)):
                 if album.name.startswith('.') or not album.is_dir() or album.is_symlink():
                     continue
@@ -177,10 +180,44 @@ def import_photos(source_root, content):
         shutil.rmtree(stage)
 
 
+def import_profile(source_root, content):
+    source_root, content = Path(source_root), Path(content)
+    config_path = content / 'site.json'
+    config = read(config_path) if config_path.exists() else {}
+    filename = config.get('profilePhotoSource', '')
+    if not filename:
+        return
+    if Path(filename).name != filename or Path(filename).suffix.lower() not in FORMATS:
+        raise ValueError('profilePhotoSource 请填写 Profile 文件夹中的照片文件名')
+    source = source_root / 'Profile' / filename
+    if not source.is_file() or source.is_symlink():
+        raise ValueError(f'Profile 照片不存在：{filename}；保留上次内容')
+    folder = content / 'profile'
+    target, marker = folder / 'photo.jpg', folder / '_photo-import.json'
+    if target.exists() and not marker.exists():
+        raise ValueError('Profile 中已有手动管理的 photo.jpg，停止覆盖')
+    digest = hashlib.sha256(source.read_bytes() + VERSION.encode()).hexdigest()
+    if target.exists() and marker.exists() and read(marker).get('hash') == digest:
+        return
+    folder.mkdir(parents=True, exist_ok=True)
+    stage = Path(tempfile.mkdtemp(prefix='.profile-import-', dir=content.parent))
+    try:
+        export_photo(source, stage / 'photo.jpg')
+        record = {'source': filename, 'hash': digest, 'version': VERSION}
+        (stage / '_photo-import.json').write_text(json.dumps(record, ensure_ascii=False, indent=2), encoding='utf-8')
+        (stage / 'photo.jpg').replace(target)
+        (stage / '_photo-import.json').replace(marker)
+        print('Profile 个人照片已准备；原文件未修改。', flush=True)
+    finally:
+        shutil.rmtree(stage)
+
+
 def prepare_local():
     source = ROOT.parent
-    if all((source / name).is_dir() for name in SECTIONS):
-        return import_photos(source, ROOT / 'content')
+    if all((source / name).is_dir() for name in REQUIRED_SECTIONS):
+        result = import_photos(source, ROOT / 'content')
+        import_profile(source, ROOT / 'content')
+        return result
     print('未发现本地照片目录，使用 content 中已准备的内容。', flush=True)
 
 
@@ -189,3 +226,4 @@ if __name__ == '__main__':
     parser.add_argument('--source', type=Path, default=ROOT.parent)
     args = parser.parse_args()
     import_photos(args.source, ROOT / 'content')
+    import_profile(args.source, ROOT / 'content')

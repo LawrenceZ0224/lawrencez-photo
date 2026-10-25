@@ -45,7 +45,7 @@ class PublishingTests(unittest.TestCase):
             self.assertTrue(page.exists())
             self.assertIn('/lawrencez-photo/assets/site.css', page.read_text())
             self.assertIn(f'/lawrencez-photo/{section}/', page.read_text())
-        self.assertIn('/lawrencez-photo/work/', (self.output / 'index.html').read_text())
+        self.assertIn('/lawrencez-photo/portfolio/', (self.output / 'index.html').read_text())
 
     def test_photo_orientation_metadata_and_no_upscaling(self):
         source = self.add_photo()
