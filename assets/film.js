@@ -13,14 +13,44 @@
   let current = 0, requested = 0, sequence = 0;
   const number = n => String(n).padStart(2, '0');
 
-  const centerThumbnail = () => {
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  let scrollAnimation = 0;
+  const stopScrolling = () => {
+    cancelAnimationFrame(scrollAnimation);
+    scrollAnimation = 0;
+  };
+  const centerThumbnail = (animate = true) => {
+    stopScrolling();
     const box = strip.getBoundingClientRect();
     const thumb = thumbs[current].getBoundingClientRect();
-    if (thumb.left < box.left + 4 || thumb.right > box.right - 4) {
-      strip.scrollTo({left: strip.scrollLeft + thumb.left - box.left - (box.width - thumb.width) / 2,
-        behavior: 'auto'});
+    const from = strip.scrollLeft;
+    const target = Math.max(0, Math.min(strip.scrollWidth - strip.clientWidth,
+      from + thumb.left + thumb.width / 2 - box.left - box.width / 2));
+    if (!animate || reducedMotion.matches || Math.abs(target - from) < 1) {
+      strip.scrollLeft = target;
+      return;
     }
+    // Restart from the current position on each selection, never queue old moves.
+    const started = performance.now();
+    const step = now => {
+      const progress = Math.min(1, (now - started) / 500);
+      strip.scrollLeft = from + (target - from) * (1 - Math.pow(1 - progress, 3));
+      scrollAnimation = progress < 1 ? requestAnimationFrame(step) : 0;
+    };
+    scrollAnimation = requestAnimationFrame(step);
   };
+  const sizeThumbnailStrip = () => {
+    // End spacers let even the first and last thumbnail sit in the center.
+    strip.style.setProperty('--film-strip-inset', `${Math.max(0, (strip.clientWidth - thumbs[0].offsetWidth) / 2)}px`);
+    centerThumbnail(false);
+  };
+  new ResizeObserver(sizeThumbnailStrip).observe(strip);
+  sizeThumbnailStrip();
+  // Native touch/trackpad scrolling takes precedence over automatic movement.
+  ['pointerdown', 'touchstart', 'wheel'].forEach(type =>
+    strip.addEventListener(type, stopScrolling, {passive:true}));
+  reducedMotion.addEventListener('change', () => centerThumbnail(false));
+
 
   async function show(index) {
     requested = (index + frames.length) % frames.length;
@@ -29,6 +59,7 @@
     status.textContent = '';
     if (target === current) {
       gallery.removeAttribute('aria-busy');
+      centerThumbnail();
       return;
     }
     gallery.setAttribute('aria-busy', 'true');

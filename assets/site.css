@@ -128,11 +128,12 @@ body.menu-open{position:fixed;inset-inline:0;top:var(--menu-scroll-offset);width
 .film-frame{position:absolute;inset:0 80px;margin:0}
 .film-frame[hidden]{display:none}
 .film-frame .portrait-picture img{object-fit:contain}
-.film-thumbnails{overflow-x:auto;padding:6px 4px;scrollbar-width:thin;overscroll-behavior-x:contain;margin:36px auto 0;max-width:1100px}
-.film-thumbnail-track{display:flex;gap:10px;width:max-content;margin-inline:auto}
-.film-thumbnail{border:0;padding:0;background:none;flex:0 0 72px;width:72px;height:72px;opacity:.42}
+.film-thumbnails{overflow-x:auto;padding:6px 0;scrollbar-width:none;scroll-behavior:auto;overflow-anchor:none;overscroll-behavior-x:contain;margin:36px auto 0;width:56%;max-width:800px}
+.film-thumbnails::-webkit-scrollbar{display:none}
+.film-thumbnail-track{display:flex;gap:10px;width:max-content;padding-inline:var(--film-strip-inset,0px)}
+.film-thumbnail{border:0;padding:0;background:none;flex:0 0 80px;width:80px;height:80px;opacity:.42;transition:opacity .5s ease}
 .film-thumbnail picture,.film-thumbnail img{display:block;width:100%;height:100%;object-fit:cover}
-.film-thumbnail[aria-current=true]{opacity:1;outline:1px solid #555;outline-offset:3px}
+.film-thumbnail[aria-current=true]{opacity:1}
 .film-thumbnail:focus-visible{outline:2px solid var(--active);outline-offset:3px;opacity:1}
 .film-counter{text-align:center;margin:14px 0 0;font-size:12px;letter-spacing:.1em;color:var(--muted)}
 .film-return{display:inline-block;margin:16px 0 0;font-size:13px;letter-spacing:.08em;color:var(--muted)}
@@ -164,8 +165,10 @@ body.menu-open{position:fixed;inset-inline:0;top:var(--menu-scroll-offset);width
   .film-stage{height:clamp(210px,calc((100vw - 84px)*var(--film-photo-ratio,1)),66svh)}
   .film-frame{inset:0 30px}
   .film-stage .portrait-prev{left:-8px}.film-stage .portrait-next{right:-8px}
-  .film-thumbnails{margin-top:28px}
+  .film-thumbnails{margin-top:28px;width:100%}
   .film-thumbnail{flex-basis:56px;width:56px;height:56px}
   .film-thumbnail-track{gap:8px}
 }
 @media(max-width:500px){.series-grid{grid-template-columns:minmax(0,1fr)}}
+
+@media(prefers-reduced-motion:reduce){.film-thumbnail{transition:none}}
