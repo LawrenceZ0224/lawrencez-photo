@@ -89,3 +89,22 @@ body.menu-open{position:fixed;inset-inline:0;top:var(--menu-scroll-offset);width
   .portrait-play{font-size:11px}
 }
 @media(prefers-reduced-motion:reduce){.portrait-frame{animation:none}.portrait-series-title{transition:none}}
+
+
+/* Portfolio: a centered opening photograph, followed by paired display cards. */
+.portfolio-page main{max-width:1600px;width:92%;padding:78px 0 80px}
+.portfolio-heading{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.portfolio-layout{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px clamp(18px,2.2vw,34px)}
+.portfolio-card{position:relative;isolation:isolate;aspect-ratio:3/2;margin:0;overflow:hidden;background:#f4f3f0}
+.portfolio-featured{grid-column:1/-1;justify-self:center;width:66%}
+.portfolio-card picture,.portfolio-card img{display:block;width:100%;height:100%}
+.portfolio-card img{object-fit:cover}
+.portfolio-card h2{position:absolute;z-index:1;top:18%;left:20px;right:20px;margin:0;color:white;font-size:clamp(20px,2.1vw,34px);line-height:1.4;font-weight:400;letter-spacing:.2em;text-align:center;text-shadow:0 1px 10px #0004;text-wrap:balance}
+.portfolio-placeholder h2{color:#77746e;text-shadow:none}
+@media(max-width:1100px){.portfolio-page main{padding-top:52px}.portfolio-card h2{font-size:clamp(20px,2.5vw,28px);letter-spacing:.14em}}
+@media(max-width:700px){
+  .portfolio-page main{width:calc(100% - 40px);padding:38px 0 48px}
+  .portfolio-layout{grid-template-columns:minmax(0,1fr);gap:18px}
+  .portfolio-featured{width:100%}
+  .portfolio-card h2{font-size:clamp(18px,5.2vw,24px);left:16px;right:16px;letter-spacing:.14em}
+}

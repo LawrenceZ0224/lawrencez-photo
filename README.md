@@ -1,6 +1,6 @@
 # LawrenceZ 摄影网站
 
-GitHub Pages 项目：LawrenceZ0224/lawrencez-photo。线上地址：https://lawrencez0224.github.io/lawrencez-photo/ 。导航为 Top、Work、Wandering on Earth、Portrait、Profile、Journal。Top 返回白底入口。
+GitHub Pages 项目：LawrenceZ0224/lawrencez-photo。线上地址：https://lawrencez0224.github.io/lawrencez-photo/ 。导航为 Top、Portfolio、Work、Wandering on Earth、Portrait、Profile、Journal。Top 返回白底入口。
 
 ## 日常照片管理
 
@@ -24,6 +24,12 @@ GitHub Pages 项目：LawrenceZ0224/lawrencez-photo。线上地址：https://law
 独立的 **网站：导入照片** 任务只准备照片；预览和发布任务会自动导入，不必重复执行。电脑上鼠标移到 Wandering on Earth 展开地点。手机端点击右上角三横线，打开独立白底全屏导航；栏目居中排列，当前栏目以蓝色标记。点击 Wandering on Earth 展开地点，选择地点后进入照片墙。右上角 × 关闭导航并保留原来的浏览位置，也支持 Esc 关闭。
 
 照片墙采用 1:1 方形缩略图，默认居中裁切。点击缩略图打开白底高清大图，大图保留原比例；左右箭头切换，右上角 × 关闭，支持键盘左右键、Esc 和手机横向滑动。关闭后保留照片墙滚动位置。
+
+## Portfolio 展示页
+
+导航中的 Portfolio 打开 `/portfolio/`。顶部为居中的 Photoset 大图；下方左右两栏依次为 Portrait / Wandering on Earth、Film / Landscape。手机端按同样顺序改为单栏。当前所有分类卡片仅展示，不跳转、不打开大图；Film、Landscape 只保留浅色背景和栏目标题。
+
+封面在 `content/site.json` 的 `portfolioCovers` 中指定：Photoset 使用 `Portrait/wsy/01.jpg`，Portrait 使用 `Portrait/anqi/01.jpg`，Wandering on Earth 使用 `Wandering on Earth/Italy/IMG_20250325_183512-77.jpg`。`album` 是 content 下的相册路径，`source` 填原照片文件名，`focus` 控制本页裁切位置。封面复用已有公开图片，不重复复制原片，也不改变原有人像作品集封面；导入后按原文件名追踪。移除指定照片前应先更换封面设置，避免构建中断。
 
 ## 人像作品集
 

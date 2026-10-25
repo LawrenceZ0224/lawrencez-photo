@@ -164,7 +164,7 @@ def build(content, destination, base_path=''):
 
         def document(path, title, body, active='', intro=False, description='', page_class=''):
             links = f'<a href="{url("")}">Top</a>'
-            for slug, label in SECTIONS:
+            for slug, label in [("portfolio", "Portfolio"), *SECTIONS]:
                 current = ' aria-current="page"' if slug == active else ''
                 if slug == 'wandering':
                     locations = ''.join(f'<a href="{url(a["path"])}">{esc(a["title"])}</a>' for a in albums['wandering'])
@@ -280,6 +280,59 @@ def build(content, destination, base_path=''):
                     '.portrait-reader{height:auto}.portrait-stage{display:block}.portrait-frame,.portrait-frame[hidden]{position:static;display:block;margin:32px 0}'
                     '.portrait-frame img{height:auto;max-height:80vh}.portrait-toolbar{padding:20px}</style></noscript>')
             document(photo_path, album['title'], body, 'portrait', description=album.get('description', ''), page_class='portrait-reader')
+
+        def portfolio_cover(key):
+            selection = config.get('portfolioCovers', {}).get(key)
+            if not selection:
+                return None
+            album = next((a for entries in albums.values() for a in entries
+                          if a['path'].rstrip('/') == selection['album']), None)
+            if album is None:
+                raise ValueError(f'Portfolio: 找不到相册 {selection["album"]}')
+            # Resolve the original filename against the latest import, so inserting
+            # or replacing photos does not break the Portfolio cover selection.
+            record = content / album['path'] / '_photo-import.json'
+            records = read_json(record)['photos'] if record.exists() else {}
+            filename = records.get(selection['source'], {}).get('file', selection['source'])
+            photo = next((p for p in album['photos'] if p['file'] == filename), None)
+            if photo is None:
+                raise ValueError(f'Portfolio: 找不到封面 {selection["album"]}/{selection["source"]}')
+            focus = selection.get('focus', photo.get('focus', [50, 50]))
+            if (not isinstance(focus, list) or len(focus) != 2 or
+                    any(not isinstance(v, (int, float)) or not 0 <= v <= 100 for v in focus)):
+                raise ValueError('Portfolio: 封面裁切位置需为两个0到100之间的数字')
+            return {**photo, 'focus': focus}
+
+        def portfolio_card(key, label, featured=False):
+            photo = portfolio_cover(key)
+            classes = 'portfolio-card' + (' portfolio-featured' if featured else '')
+            media = ''
+            if photo:
+                variants = photo['variants']
+                fallback = next(v for v in reversed(variants) if v['jpg'])
+                srcset = ', '.join(f'{url(v["webp"])} {v["width"]}w' for v in variants)
+                size = ('(max-width:700px) calc(100vw - 40px), (min-width:1740px) 1067px, 61vw'
+                        if featured else '(max-width:700px) calc(100vw - 40px), (min-width:1740px) 784px, 45vw')
+                focus = photo['focus']
+                media = (f'<picture><source type="image/webp" srcset="{esc(srcset)}" sizes="{size}">'
+                         f'<img src="{url(fallback["jpg"])}" width="{photo["width"]}" height="{photo["height"]}" '
+                         f'alt="" style="object-position:{focus[0]}% {focus[1]}%" '
+                         f'loading="{"eager" if featured else "lazy"}" '
+                         f'fetchpriority="{"high" if featured else "auto"}" decoding="async"></picture>')
+            else:
+                classes += ' portfolio-placeholder'
+            # Display-only cards deliberately have no link, button or click handler.
+            return (f'<article class="{classes}" aria-labelledby="portfolio-{key}">'
+                    f'{media}<h2 id="portfolio-{key}">{esc(label)}</h2></article>')
+
+        portfolio = '<h1 class="portfolio-heading">Portfolio</h1><div class="portfolio-layout">'
+        portfolio += portfolio_card('photoset', 'Photoset', featured=True)
+        portfolio += portfolio_card('portrait', 'Portrait')
+        portfolio += portfolio_card('wandering', 'Wandering on Earth')
+        portfolio += portfolio_card('film', 'Film')
+        portfolio += portfolio_card('landscape', 'Landscape')
+        portfolio += '</div>'
+        document('portfolio/', 'Portfolio', portfolio, 'portfolio', page_class='portfolio-page')
 
         intro = f'<div class="entry-inner"><h1 class="entry-name">{esc(name)}</h1><a class="enter-link" href="{url("work/")}">ENTER SITE</a></div>'
         document('', 'Photography', intro, intro=True)

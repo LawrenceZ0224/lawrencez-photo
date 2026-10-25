@@ -10,5 +10,31 @@
   "portraitOrder": [
     "wsy",
     "anqi"
-  ]
+  ],
+  "portfolioCovers": {
+    "photoset": {
+      "album": "portrait/wsy",
+      "source": "01.jpg",
+      "focus": [
+        50,
+        65
+      ]
+    },
+    "portrait": {
+      "album": "portrait/anqi",
+      "source": "01.jpg",
+      "focus": [
+        50,
+        32
+      ]
+    },
+    "wandering": {
+      "album": "wandering/italy",
+      "source": "IMG_20250325_183512-77.jpg",
+      "focus": [
+        50,
+        75
+      ]
+    }
+  }
 }
