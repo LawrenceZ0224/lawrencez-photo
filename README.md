@@ -30,7 +30,7 @@ GitHub Pages 项目：LawrenceZ0224/lawrencez-photo。线上地址：https://law
 
 ## Portfolio 与作品集目录
 
-导航中的 Portfolio 打开 `/portfolio/`。顶部为居中的 Photoset 大图；下方左右两栏依次为 Portrait / Wandering on Earth、Film / Landscape。手机端按同样顺序改为单栏。Photoset、Portrait、Wandering on Earth、Film 卡片分别进入对应页面；Landscape 仍保留空白位置，不跳转。
+导航中的 Portfolio 打开 `/portfolio/`。顶部为居中的 Photoset 大图；下方左右两栏依次为 Portrait / Wandering on Earth、Film / Landscape。手机端按同样顺序改为单栏。Photoset、Portrait、Film 卡片分别进入对应页面，Wandering on Earth 卡片直接打开 Singapore 照片墙；Landscape 仍保留空白位置，不跳转。
 
 封面在 `content/site.json` 的 `portfolioCovers` 中指定：Photoset 使用 `Portrait/wsy/01.jpg`，Portrait 使用 `Portrait/anqi/01.jpg`，Wandering on Earth 使用 `Wandering on Earth/Italy/IMG_20250325_183512-77.jpg`。Film 使用 `Film/Autumn in BUPT 2025/03.JPG`。`album` 是 content 下的相册路径，`source` 填原照片文件名，`focus` 控制本页裁切位置。封面复用已有公开图片，不重复复制原片，也不改变原有人像作品集封面；导入后按原文件名追踪。移除指定照片前应先更换封面设置，避免构建中断。
 
@@ -61,7 +61,7 @@ Portrait 采用“作品集选择 → 全屏封面 → START 进入组图”的�
 
 `scripts/import_photos.py` 只读取 code 同级相册，生成 `content/` 下的网页成片，最长边不超过 3840 像素，不放大小图，矫正方向、转换 sRGB、去除 EXIF。原文件不被修改或删除。处理后的公开副本会随仓库提交；原片、登录信息不应放进 code。照片文件名和相册名也可能出现在公开元数据中。
 
-导入记录 `_photo-import.json` 用于复用未变的公开副本、跟踪增删；不要手动修改它或往自动管理的相册中混入其他照片。中断复制、损坏图片会停止导入，保留上一批成功的内容。缺少三个来源主文件夹时拒绝独立导入，避免误移除内容。预览遇到问题保留上一版网页。
+导入记录 `_photo-import.json` 用于复用未变的公开副本、跟踪增删；不要手动修改它或往自动管理的相册中混入其他照片。中断复制、损坏图片会停止导入，保留上一批成功的内容。Wandering on Earth、Portrait 为必需来源主文件夹，缺少任意一个时拒绝独立导入，避免误移除内容。Work 与 Film 为可选目录，整个目录缺失时保留其已导入内容，并继续导入其他分类。预览遇到问题保留上一版网页。
 
 从本地相册移除照片，会在下次成功导入后从当前网站移除；线上更新仍需发布。GitHub 公开仓库历史可能保留已经提交的照片，删除当前页面不等于清除历史。原文件另做独立备份。
 

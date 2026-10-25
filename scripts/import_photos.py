@@ -12,7 +12,7 @@ from PIL import Image, ImageCms, ImageOps
 
 ROOT = Path(__file__).resolve().parents[1]
 SECTIONS = {'Work': 'work', 'Wandering on Earth': 'wandering', 'Portrait': 'portrait', 'Film': 'film'}
-REQUIRED_SECTIONS = ('Work', 'Wandering on Earth', 'Portrait')
+REQUIRED_SECTIONS = ('Wandering on Earth', 'Portrait')
 FORMATS = {'.jpg', '.jpeg', '.png', '.webp', '.tif', '.tiff'}
 MARKER = '_photo-import.json'
 VERSION = 'srgb-3840-jpeg94-v2'
@@ -62,7 +62,7 @@ def export_photo(source, target):
 def import_photos(source_root, content):
     source_root, content = Path(source_root), Path(content)
     if not all((source_root / name).is_dir() for name in REQUIRED_SECTIONS):
-        raise ValueError('照片根目录必须包含 Work、Wandering on Earth、Portrait 三个文件夹；停止导入以免误移除相册。')
+        raise ValueError('照片根目录必须包含 Wandering on Earth、Portrait 两个文件夹；停止导入以免误移除相册。')
     content.mkdir(parents=True, exist_ok=True)
     stage = Path(tempfile.mkdtemp(prefix='.photo-import-', dir=content.parent))
     plans, seen, total, converted = [], set(), 0, 0

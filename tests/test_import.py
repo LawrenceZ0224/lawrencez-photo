@@ -89,10 +89,28 @@ class PhotoImportTests(unittest.TestCase):
         self.assertFalse(self.managed().exists())
         self.assertTrue((manual / 'keep.txt').exists())
         snapshot = self.snapshot()
-        (self.source / 'Work').rmdir()
+        (self.source / 'Portrait').rmdir()
         with self.assertRaises(ValueError):
             importer.import_photos(self.source, self.content)
         self.assertEqual(self.snapshot(), snapshot)
+
+    def test_missing_work_keeps_published_work_and_imports_other_photos(self):
+        work = self.source / 'Work' / '2025'
+        work.mkdir()
+        original = work / '01.jpg'
+        Image.new('RGB', (80, 120), '#778899').save(original)
+        self.photo('1.jpg')
+        importer.import_photos(self.source, self.content)
+        old_work = {str(p.relative_to(self.content)): p.read_bytes()
+                    for p in (self.content / 'work').rglob('*') if p.is_file()}
+        original.unlink()
+        work.rmdir()
+        (self.source / 'Work').rmdir()
+        self.photo('2.jpg')
+        self.assertEqual(importer.import_photos(self.source, self.content), (2, 1))
+        for name, data in old_work.items():
+            self.assertEqual((self.content / name).read_bytes(), data)
+        self.assertEqual(len(list(self.managed().glob('*.jpg'))), 2)
 
 
 if __name__ == '__main__':

@@ -343,7 +343,7 @@ def build(content, destination, base_path=''):
             else:
                 classes += ' portfolio-placeholder'
             destinations = {'photoset': 'photoset/', 'portrait': 'portrait/',
-                            'wandering': 'wandering/', 'film': 'film/'}
+                            'wandering': 'wandering/singapore/', 'film': 'film/'}
             contents = f'{media}<h2 id="portfolio-{key}">{esc(label)}</h2>'
             if key in destinations:
                 contents = f'<a class="portfolio-link" href="{url(destinations[key])}" aria-labelledby="portfolio-{key}">{contents}</a>'
