@@ -6,5 +6,9 @@
   "profilePhoto": "",
   "notes": "",
   "email": "",
-  "siteUrl": "https://lawrencez0224.github.io"
+  "siteUrl": "https://lawrencez0224.github.io",
+  "portraitOrder": [
+    "wsy",
+    "anqi"
+  ]
 }

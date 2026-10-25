@@ -141,6 +141,14 @@ def build(content, destination, base_path=''):
                                 'mobileCoverPhoto': mobile_cover,
                                 'introCoverPhoto': intro_cover, 'mobileIntroCoverPhoto': mobile_intro,
                                 'path': f'{section}/{folder.name}/'})
+            if section == 'portrait':
+                preferred = config.get('portraitOrder', [])
+                if (not isinstance(preferred, list) or
+                        any(not isinstance(slug, str) for slug in preferred) or
+                        len(set(preferred)) != len(preferred)):
+                    raise ValueError('portraitOrder 必须是不重复的作品集文件夹名称列表')
+                positions = {slug: n for n, slug in enumerate(preferred)}
+                entries.sort(key=lambda album: positions.get(album['slug'], len(positions)))
             albums[section] = entries
 
         def picture(photo, full=False):
@@ -265,7 +273,7 @@ def build(content, destination, base_path=''):
                     '<p class="portrait-status" role="status"></p></div>'
                     '<div class="portrait-toolbar">'
                     f'<a class="portrait-return" href="{url("portrait/")}">← Portrait</a>'
-                    f'<div class="portrait-caption"><span>{esc(album["title"])}</span> '
+                    '<div class="portrait-caption">'
                     f'<span data-count aria-live="off">01 / {len(album["photos"]):02d}</span></div>'
                     '<button class="portrait-play" data-play type="button" aria-label="暂停自动播放" hidden>Pause</button>'
                     '</div></section><noscript><style>'
