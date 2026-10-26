@@ -11,7 +11,7 @@ import tempfile
 from PIL import Image, ImageCms, ImageOps
 
 ROOT = Path(__file__).resolve().parents[1]
-SECTIONS = {'Work': 'work', 'Wandering on Earth': 'wandering', 'Portrait': 'portrait', 'Film': 'film'}
+SECTIONS = {'Work': 'work', 'Wandering on Earth': 'wandering', 'Portrait': 'portrait', 'Film': 'film', 'Vignettes': 'vignettes'}
 REQUIRED_SECTIONS = ('Wandering on Earth', 'Portrait')
 FORMATS = {'.jpg', '.jpeg', '.png', '.webp', '.tif', '.tiff'}
 MARKER = '_photo-import.json'
@@ -71,11 +71,16 @@ def import_photos(source_root, content):
             section_root = source_root / folder_name
             if not section_root.exists() and folder_name not in REQUIRED_SECTIONS:
                 continue
-            for album in sorted(section_root.iterdir(), key=lambda p: natural_key(p.name)):
+            # Vignettes is a single gallery with photos directly in its folder.
+            flat = section == 'vignettes'
+            if flat and (not section_root.is_dir() or section_root.is_symlink()):
+                raise ValueError('Vignettes 必须是实际照片文件夹；保留上次导入内容')
+            sources = [section_root] if flat else sorted(section_root.iterdir(), key=lambda p: natural_key(p.name))
+            for album in sources:
                 if album.name.startswith('.') or not album.is_dir() or album.is_symlink():
                     continue
-                relative = f'{folder_name}/{album.name}'
-                destination = content / section / slug(album.name)
+                relative = folder_name if flat else f'{folder_name}/{album.name}'
+                destination = content / section / ('main' if flat else slug(album.name))
                 if destination in seen:
                     raise ValueError(f'相册名称大小写冲突：{relative}')
                 seen.add(destination)
@@ -120,6 +125,9 @@ def import_photos(source_root, content):
                 for field in ['captions', 'focus']:
                     meta[field] = {remap[key]: value for key, value in meta.get(field, {}).items() if key is not None and key in remap}
                 meta['title'] = album.name
+                if flat:
+                    for name, info in records.items():
+                        meta['captions'].setdefault(info['file'], Path(name).stem)
                 for field in ['cover', 'mobileCover', 'introCover', 'mobileIntroCover']:
                     # Remember source filenames, so replacing/reordering a photo keeps its cover role.
                     source_name = meta.get(field + 'Source', '')

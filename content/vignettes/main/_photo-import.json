@@ -1,0 +1,14 @@
+{
+  "source": "Vignettes",
+  "version": "srgb-3840-jpeg94-v2",
+  "photos": {
+    "Fly into the Blue.jpg": {
+      "file": "000001-86d8fdf3eb1a1820.jpg",
+      "hash": "86d8fdf3eb1a1820766bd0d2225fa058b7aaf4889b0772003473b6b1766ef355"
+    },
+    "Into the Mist.jpg": {
+      "file": "000002-aa2813922fbd43c4.jpg",
+      "hash": "aa2813922fbd43c48886ee1c8d800f6217c72885a43238acdaee356c5b77522a"
+    }
+  }
+}

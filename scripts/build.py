@@ -95,7 +95,7 @@ def build(content, destination, base_path=''):
     try:
         shutil.copytree(ROOT / 'assets', stage / 'assets')
         albums = {}
-        for section, _ in [*SECTIONS[:3], ("film", "Film")]:
+        for section, _ in [*SECTIONS[:3], ("film", "Film"), ("vignettes", "Vignettes")]:
             entries = []
             source = content / section
             for folder in sorted(source.iterdir() if source.exists() else [], key=lambda p: natural_key(p.name), reverse=section == 'work'):
@@ -137,10 +137,16 @@ def build(content, destination, base_path=''):
                 intro_cover = next((p for p in photos if p['file'] == intro_name), cover)
                 mobile_intro = next((p for p in photos if p['file'] == mobile_intro_name),
                                     intro_cover if intro_name else mobile_cover)
+                if section == 'vignettes':
+                    if folder.name != 'main':
+                        raise ValueError('Vignettes 使用一个 main 相册；照片直接放入本地 Vignettes 文件夹')
+                    if cover:
+                        photos = [cover] + [p for p in photos if p['file'] != cover['file']]
                 entries.append({**meta, 'slug': folder.name, 'photos': photos, 'coverPhoto': cover,
                                 'mobileCoverPhoto': mobile_cover,
                                 'introCoverPhoto': intro_cover, 'mobileIntroCoverPhoto': mobile_intro,
-                                'path': f'{section}/{folder.name}/', 'sourcePath': f'{section}/{folder.name}/'})
+                                'path': 'vignettes/' if section == 'vignettes' else f'{section}/{folder.name}/',
+                                'sourcePath': f'{section}/{folder.name}/'})
             if section == 'portrait':
                 preferred = config.get('portraitOrder', [])
                 if (not isinstance(preferred, list) or
@@ -343,7 +349,7 @@ def build(content, destination, base_path=''):
             else:
                 classes += ' portfolio-placeholder'
             destinations = {'photoset': 'photoset/', 'portrait': 'portrait/',
-                            'wandering': 'wandering/singapore/', 'film': 'film/'}
+                            'wandering': 'wandering/singapore/', 'film': 'film/', 'vignettes': 'vignettes/'}
             contents = f'{media}<h2 id="portfolio-{key}">{esc(label)}</h2>'
             if key in destinations:
                 contents = f'<a class="portfolio-link" href="{url(destinations[key])}" aria-labelledby="portfolio-{key}">{contents}</a>'
@@ -354,7 +360,7 @@ def build(content, destination, base_path=''):
         portfolio += portfolio_card('portrait', 'Portrait')
         portfolio += portfolio_card('wandering', 'Wandering on Earth')
         portfolio += portfolio_card('film', 'Film')
-        portfolio += portfolio_card('landscape', 'Landscape')
+        portfolio += portfolio_card('vignettes', 'Vignettes')
         portfolio += '</div>'
         document('portfolio/', 'Portfolio', portfolio, 'portfolio', page_class='portfolio-page')
 
@@ -401,11 +407,11 @@ def build(content, destination, base_path=''):
         document('photoset/', 'Photoset', series_catalog(albums['portrait'], 'Photoset', True),
                  'portfolio', page_class='series-index')
         document('film/', 'Film', series_catalog(albums['film'], 'Film'), 'portfolio', page_class='series-index')
-        for album in albums['film']:
+        def thumbnail_gallery(album, back_path, back_label):
             photos = album['photos']
             if not photos:
                 document(album['path'], album['title'], f'<h1>{esc(album["title"])}</h1>' + empty(), 'portfolio')
-                continue
+                return
             frames = ''.join(f'<figure class="film-frame" data-film-frame{" hidden" if n else ""}>'
                              f'{portrait_picture(p, first=n == 0)}</figure>' for n, p in enumerate(photos))
             thumbs = ''.join(f'<button class="film-thumbnail" type="button" data-film-thumb="{n}" '
@@ -422,10 +428,16 @@ def build(content, destination, base_path=''):
                     '<button type="button" data-film-retry hidden>重新加载</button></div>'
                     f'<div class="film-thumbnails" aria-label="照片缩略图"><div class="film-thumbnail-track">{thumbs}</div></div>'
                     f'<p class="film-counter" data-film-count aria-live="polite">01 / {len(photos):02d}</p></section>'
-                    f'<a class="film-return" href="{url("film/")}">← Film</a>'
+                    f'<a class="film-return" href="{url(back_path)}">← {esc(back_label)}</a>'
                     '<noscript><style>.film-stage{height:auto}.film-frame,.film-frame[hidden]{position:static;display:block;margin:30px 0}'
                     '.film-frame img{height:auto}.film-thumbnails,.film-stage button{display:none}</style></noscript>')
             document(album['path'], album['title'], body, 'portfolio', page_class='film-reader')
+
+        for album in albums['film']:
+            thumbnail_gallery(album, 'film/', 'Film')
+        vignette = albums['vignettes'][0] if albums['vignettes'] else {
+            'title': 'Vignettes', 'path': 'vignettes/', 'photos': []}
+        thumbnail_gallery(vignette, 'portfolio/', 'Portfolio')
 
         profile = '<h1 class="visually-hidden">Profile</h1><div class="profile-layout"><div class="profile-portrait">'
         if config.get('profilePhoto'):

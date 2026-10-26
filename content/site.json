@@ -43,6 +43,14 @@
         50,
         50
       ]
+    },
+    "vignettes": {
+      "album": "vignettes/main",
+      "source": "Into the Mist.jpg",
+      "focus": [
+        50,
+        50
+      ]
     }
   },
   "profilePhotoSource": "微信图片_20261025221057_130_8_01.png"

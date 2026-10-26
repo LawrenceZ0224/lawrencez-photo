@@ -16,6 +16,7 @@ GitHub Pages 项目：LawrenceZ0224/lawrencez-photo。线上地址：https://law
 │   └── 主题名称/               按人物或拍摄项目分类
 ├── Film/
 │   └── Autumn in BUPT 2025/   胶片作品集
+├── Vignettes/                照片直接放入，例如 Into the Mist.jpg
 ├── Profile/                  个人照片
 └── code/                      网站代码和自动准备的公开副本
 ```
@@ -30,13 +31,15 @@ GitHub Pages 项目：LawrenceZ0224/lawrencez-photo。线上地址：https://law
 
 ## Portfolio 与作品集目录
 
-导航中的 Portfolio 打开 `/portfolio/`。顶部为居中的 Photoset 大图；下方左右两栏依次为 Portrait / Wandering on Earth、Film / Landscape。手机端按同样顺序改为单栏。Photoset、Portrait、Film 卡片分别进入对应页面，Wandering on Earth 卡片直接打开 Singapore 照片墙；Landscape 仍保留空白位置，不跳转。
+导航中的 Portfolio 打开 `/portfolio/`。顶部为居中的 Photoset 大图；下方左右两栏依次为 Portrait / Wandering on Earth、Film / Vignettes。手机端按同样顺序改为单栏。Photoset、Portrait、Film 卡片分别进入对应页面，Wandering on Earth 卡片直接打开 Singapore 照片墙；Vignettes 卡片直接打开大图与缩略图展示页。
 
 封面在 `content/site.json` 的 `portfolioCovers` 中指定：Photoset 使用 `Portrait/wsy/01.jpg`，Portrait 使用 `Portrait/anqi/01.jpg`，Wandering on Earth 使用 `Wandering on Earth/Italy/IMG_20250325_183512-77.jpg`。Film 使用 `Film/Autumn in BUPT 2025/03.JPG`。`album` 是 content 下的相册路径，`source` 填原照片文件名，`focus` 控制本页裁切位置。封面复用已有公开图片，不重复复制原片，也不改变原有人像作品集封面；导入后按原文件名追踪。移除指定照片前应先更换封面设置，避免构建中断。
 
 Photoset 与 Film 目录在电脑上每行显示三个作品集，封面下方显示作品名称；窄屏自动变为两栏或单栏。Photoset 复用现有人像作品集，顺序仍为 wsy、anqi；目前以 Series 01、Series 02 显示，避免暴露文件夹名称，可在对应 `album.json` 添加 `catalogTitle` 指定正式作品名称。
 
 Film 第一个作品集是 Autumn in BUPT 2025，目录封面使用 `01.JPG`（在其 `album.json` 设置 `coverSource`）。点击进入后显示原比例大图、左右箭头与底部 1:1 缩略图。点击缩略图、键盘左右键或手机横滑均可切换；当前缩略图保持清晰，其余淡化；点击缩略图或左右切换时，缩略图条在半秒内平滑移动，让当前照片居中（首尾照片也能居中）。手机支持手指横向滑动缩略图条，滚动缩略图条不会改变整页位置。连续点击会从当前位置转向最新选择，开启系统减少动态效果时直接定位。不自动播放。后续在 Film 下新建作品集文件夹即可自动导入。Film 为可选来源目录，缺失整个 Film 目录时保留已导入内容。
+
+Vignettes 使用 code 同级的 `Vignettes/` 文件夹，照片直接放在其中，无须创建二级相册。Portfolio 封面和打开后的第一张使用 `Into the Mist.jpg`，之后按文件名顺序展示其余作品。详情页 `/vignettes/` 复用 Film 的原比例大图、左右切换、手机滑动、1:1 缩略图及平滑居中效果，返回入口为 Portfolio。后续增删照片按原有预览／发布流程同步；整个 Vignettes 文件夹缺失时保留已导入内容。更换封面时需同步修改 `content/site.json` 的 `portfolioCovers.vignettes` 和 `content/vignettes/main/album.json` 的 `coverSource`。
 
 ## 人像作品集
 
@@ -61,7 +64,7 @@ Portrait 采用“作品集选择 → 全屏封面 → START 进入组图”的�
 
 `scripts/import_photos.py` 只读取 code 同级相册，生成 `content/` 下的网页成片，最长边不超过 3840 像素，不放大小图，矫正方向、转换 sRGB、去除 EXIF。原文件不被修改或删除。处理后的公开副本会随仓库提交；原片、登录信息不应放进 code。照片文件名和相册名也可能出现在公开元数据中。
 
-导入记录 `_photo-import.json` 用于复用未变的公开副本、跟踪增删；不要手动修改它或往自动管理的相册中混入其他照片。中断复制、损坏图片会停止导入，保留上一批成功的内容。Wandering on Earth、Portrait 为必需来源主文件夹，缺少任意一个时拒绝独立导入，避免误移除内容。Work 与 Film 为可选目录，整个目录缺失时保留其已导入内容，并继续导入其他分类。预览遇到问题保留上一版网页。
+导入记录 `_photo-import.json` 用于复用未变的公开副本、跟踪增删；不要手动修改它或往自动管理的相册中混入其他照片。中断复制、损坏图片会停止导入，保留上一批成功的内容。Wandering on Earth、Portrait 为必需来源主文件夹，缺少任意一个时拒绝独立导入，避免误移除内容。Work、Film 与 Vignettes 为可选目录，整个目录缺失时保留其已导入内容，并继续导入其他分类。预览遇到问题保留上一版网页。
 
 从本地相册移除照片，会在下次成功导入后从当前网站移除；线上更新仍需发布。GitHub 公开仓库历史可能保留已经提交的照片，删除当前页面不等于清除历史。原文件另做独立备份。
 
